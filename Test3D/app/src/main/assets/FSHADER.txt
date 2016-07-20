@@ -5,10 +5,12 @@ precision mediump float;
 uniform sampler2D u_Sampler;	//図形に貼るテクスチャ
 uniform float u_alpha;		//アルファ―値
 varying vec2 v_TexCoord;	//頂点シェーダからテクスチャ座標を受け取る
-varying vec4 v_Light;
+varying vec3 a_LightColor;
+varying float a_nDotL;
 void main() {
-  gl_FragColor = texture2D(u_Sampler,v_TexCoord);
+  vec4 texColor = texture2D(u_Sampler,v_TexCoord);
+  vec3 diffuse = a_LightColor * texColor.rgb * a_nDotL;
+  gl_FragColor = vec4(diffuse,texColor.a);
   gl_FragColor.a *= u_alpha;
-  gl_FragColor *= v_Light;
   //gl_FragColor = vec4(0.0, 1.0, 0.0, 0.5);
 }

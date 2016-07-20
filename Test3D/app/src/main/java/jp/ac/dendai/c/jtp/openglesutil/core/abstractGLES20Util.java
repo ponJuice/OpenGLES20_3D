@@ -31,8 +31,8 @@ public abstract class abstractGLES20Util {
 	/**
 	 * floatのバイト数
 	 */
-	private static final int FSIZE = Float.SIZE / Byte.SIZE;//floatのバイト数
-	private static final int ISIZE = Integer.SIZE / Byte.SIZE;
+	protected static final int FSIZE = Float.SIZE / Byte.SIZE;//floatのバイト数
+	protected static final int ISIZE = Integer.SIZE / Byte.SIZE;
 	/**
 	 * glSurfaceViewを使っているアクティビティ
 	 */
@@ -88,6 +88,7 @@ public abstract class abstractGLES20Util {
 	protected static int va_Normal;
 	protected static int vu_LightColor;
 	protected static int vu_LightDirection;
+	protected static int mu_NormalMatrix;
 	/**
 	 * サンプラーの場所
 	 */
@@ -161,6 +162,9 @@ public abstract class abstractGLES20Util {
 	 */
 	protected static float[] modelMatrix = new float[16];
 
+	protected static float[] invertMatrix = new float[16];
+	protected static float[] normalMatrix = new float[16];
+
 	public static float getWidth(){
 		return Width;
 	}
@@ -214,6 +218,11 @@ public abstract class abstractGLES20Util {
 		GLES20.glEnable(GLES20.GL_BLEND);
 		//ブレンディングメソッドの有効化
 		GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+		//隠面消去の有効化
+		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+		//裏面を表示しない
+		GLES20.glEnable(GLES20.GL_CULL_FACE);
+		GLES20.glCullFace(GLES20.GL_BACK);
 	}
 
 	/**
@@ -357,6 +366,10 @@ public abstract class abstractGLES20Util {
 		if(vu_LightDirection == -1){
 			throw new RuntimeException("u_LightDirectionの格納場所の取得に失敗");
 		}
+		mu_NormalMatrix = GLES20.glGetUniformLocation(program,"u_NormalMatrix");
+		if(mu_NormalMatrix == -1){
+			throw new RuntimeException("mu_NormalMatrixの格納場所の取得に失敗");
+		}
 	}
 
 	/**
@@ -373,6 +386,10 @@ public abstract class abstractGLES20Util {
 	//シェーダにモデル行列を設定
 	protected static void setShaderModelMatrix(float[] modelMatrix){
 		GLES20.glUniformMatrix4fv(mu_modelMatrix, 1, false, modelMatrix, 0);
+	}
+
+	protected static void setShaderNormalMatrix(float[] normalMatrix){
+		GLES20.glUniformMatrix4fv(mu_NormalMatrix, 1, false, normalMatrix, 0);
 	}
 
 	/**
@@ -603,7 +620,7 @@ public abstract class abstractGLES20Util {
 		}
 
 		GLES20.glUniform3f(vu_LightColor, 1f, 1f, 1f);
-		float[] lightDirection = new float[] { 0.5f,3.0f,4.0f};
+		float[] lightDirection = new float[] { 0,-1.0f,0};
 		normalizeVector3(lightDirection);
 		GLES20.glUniform3fv(vu_LightDirection,1,lightDirection,0);
 

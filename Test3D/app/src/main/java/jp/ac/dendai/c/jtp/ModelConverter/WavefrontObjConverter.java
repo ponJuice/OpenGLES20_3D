@@ -15,6 +15,7 @@ public class WavefrontObjConverter {
 		String modelName = "";
 		String matelialName = "";
         String[] lines = code.split("\n");
+		int meshOffset = 0;
         for(int n=0;n < lines.length;n++) {
             String[] charas = lines[n].split(" ");
             if(charas[0].equals("#")){
@@ -39,17 +40,47 @@ public class WavefrontObjConverter {
             	texture.add(Float.valueOf(charas[2]));
             	texture.add(Float.valueOf(charas[3]));
             }else if(charas[0].equals("f")){
+				Integer vs = null,ve = null,texs = null,texe = null,norms = null,norme = null;
             	for(int m = 1;m < charas.length ;m++){
             		String[] t = charas[m].split("/");
             		if(!t[0].equals("")){
-            			v_indices.add(Integer.valueOf(t[0]));
+						if(charas.length == 5 && m == 1){
+							vs = new Integer(t[0])-1;
+						}else if(charas.length == 5 && m == 3){
+							ve = new Integer(t[0])-1;
+						}
+            			v_indices.add(Integer.valueOf(t[0])-1);
             		}
             		if(!t[1].equals("")){
-            			t_indices.add(Integer.valueOf(t[1]));
+						if(charas.length == 5 && m == 1){
+							texs = new Integer(t[1])-1;
+						}else if(charas.length == 5 && m == 3){
+							texe = new Integer(t[1])-1;
+						}
+            			t_indices.add(Integer.valueOf(t[1])-1);
             		}
             		if(!t[2].equals("")){
-            			n_indices.add(Integer.valueOf(t[2]));
+						if(charas.length == 5 && m == 1){
+							norms = new Integer(t[2])-1;
+						}else if(charas.length == 5 && m == 3){
+							norme = new Integer(t[2])-1;
+						}
+            			n_indices.add(Integer.valueOf(t[2])-1);
             		}
+					if(charas.length == 5 && m == 4){
+						if(v_indices.size() != 0) {
+							v_indices.add(vs);
+							v_indices.add(ve);
+						}
+						if(t_indices.size() != 0) {
+							t_indices.add(texs);
+							t_indices.add(texe);
+						}
+						if(n_indices.size() != 0) {
+							n_indices.add(norms);
+							n_indices.add(norme);
+						}
+					}
             	}
             }
         }

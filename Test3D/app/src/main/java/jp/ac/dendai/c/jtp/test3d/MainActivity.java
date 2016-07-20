@@ -62,7 +62,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         mode.setIndexBufferObject(GLES20Util.createBufferObject(1)[0]);
         mode.setNormalBufferObject(GLES20Util.createBufferObject(1)[0]);
 
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // 画面をクリアする色を設定する
+        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f); // 画面をクリアする色を設定する
     }
     private void process(){
         fpsController.updateFps();
@@ -80,7 +80,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
             }
         }
         count++;*/
-        mode.draw(0,0,0,0.1f,0.1f,0.1f,0,0,count%(360*2));
+        mode.draw(0,0,0,1f,1f,1f,0,0,count%(360*2));
         count++;
         /*
         //文字の描画

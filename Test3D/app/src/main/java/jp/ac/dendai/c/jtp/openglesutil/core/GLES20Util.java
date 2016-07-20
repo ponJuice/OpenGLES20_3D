@@ -114,10 +114,18 @@ public class GLES20Util extends abstractGLES20Util {
 								 Bitmap texture,
 								 int vertexBufferObject,int normalBufferObject,int indexBufferObject,int indexCount){
 		Matrix.setIdentityM(modelMatrix, 0);
+		Matrix.setIdentityM(invertMatrix,0);
+		Matrix.setIdentityM(normalMatrix,0);
+
 		Matrix.translateM(modelMatrix, 0, x, y, z);
 		Matrix.scaleM(modelMatrix, 0, scaleX, scaleY, scaleZ);
 		Matrix.rotateM(modelMatrix, 0, degreeZ, 0, 0, 1);
+
+		Matrix.invertM(invertMatrix, 0, modelMatrix, 0);
+		Matrix.transposeM(normalMatrix, 0, invertMatrix, 0);
+
 		setShaderModelMatrix(modelMatrix);
+		setShaderNormalMatrix(normalMatrix);
 
 		setOnTexture(texture, 1.0f);
 
@@ -131,7 +139,7 @@ public class GLES20Util extends abstractGLES20Util {
 		GLES20.glEnableVertexAttribArray(va_Normal);
 
 		GLES20.glLineWidth(4.0f);
-		GLES20.glDrawElements(GLES20.GL_TRIANGLE_STRIP, 8, GLES20.GL_UNSIGNED_INT, 0);
+		GLES20.glDrawElements(GLES20.GL_TRIANGLES, indexCount, GLES20.GL_UNSIGNED_INT, 0);
 		//GLES20.glDrawArrays(GLES20.GL_LINE_STRIP,0,8);
 		GLES20.glDisableVertexAttribArray(ma_Position);
 		GLES20.glDisableVertexAttribArray(va_Normal);
