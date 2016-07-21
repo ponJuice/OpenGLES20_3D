@@ -79,7 +79,7 @@ public abstract class abstractGLES20Util {
 	/**
 	 * テクスチャオブジェクトの格納場所
 	 */
-	private static int ma_texCoord;				//テクスチャオブジェクトの格納場所
+	public static int ma_texCoord;				//テクスチャオブジェクトの格納場所
 	/**
 	 * モデル行列格納場所
 	 */
@@ -608,7 +608,7 @@ public abstract class abstractGLES20Util {
 		float[] viewMatrix = new float[16];
 		if(Perspective){
 			setPerspectiveM(u_ProjMatrix,0,40.0,(double)width/height,1.0,100.0);
-		    Matrix.setLookAtM(viewMatrix, 0, -5f, 5f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+		    Matrix.setLookAtM(viewMatrix, 0, -5f, 5f, 5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 		    Matrix.multiplyMM(viewProjMatrix, 0, u_ProjMatrix, 0, viewMatrix, 0);
 		}
 		else{
@@ -620,7 +620,7 @@ public abstract class abstractGLES20Util {
 		}
 
 		GLES20.glUniform3f(vu_LightColor, 1f, 1f, 1f);
-		float[] lightDirection = new float[] { 0,-1.0f,0};
+		float[] lightDirection = new float[] { 0,1.0f,0};
 		normalizeVector3(lightDirection);
 		GLES20.glUniform3fv(vu_LightDirection,1,lightDirection,0);
 

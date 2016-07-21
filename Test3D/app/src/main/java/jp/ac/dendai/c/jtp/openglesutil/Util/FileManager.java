@@ -13,6 +13,13 @@ import android.content.res.AssetManager;
  *
  */
 public class FileManager {
+    public static Activity _act;
+    public static void initFileManager(Activity act){
+        _act = act;
+    }
+    public static String readTextFile(String fileName){
+        return readShaderFile(_act,fileName);
+    }
 	/**
 	 * assetsフォルダに入っているシェーダファイルを読み込みます
 	 * 正直シェーダファイルでなくても読み込める

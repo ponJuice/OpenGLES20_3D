@@ -77,7 +77,7 @@ public class GLES20Util extends abstractGLES20Util {
 
 		//float[] modelMatrix = new float[16];
 		Matrix.setIdentityM(modelMatrix, 0);
-		Matrix.translateM(modelMatrix,0,startX,startY,0.0f);
+		Matrix.translateM(modelMatrix, 0, startX, startY, 0.0f);
 		Matrix.scaleM(modelMatrix, 0, scaleX, scaleY, 1.0f);
 		setShaderModelMatrix(modelMatrix);
 
@@ -85,8 +85,10 @@ public class GLES20Util extends abstractGLES20Util {
 
 		mode.setBlendMode();
 		GLES20.glBindBuffer(ma_Position, planeBufferObject);
+		GLES20.glVertexAttribPointer(ma_Position,2,GLES20.GL_FLOAT,false,0,0);
 		GLES20.glEnableVertexAttribArray(ma_Position);
 		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);	//描画
+		GLES20.glDisableVertexAttribArray(ma_Position);
 	}
 
 	public static void DrawGraph(float startX,float startY,float lengthX,float lengthY,float degree,Bitmap image,float alpha,GLES20COMPOSITIONMODE mode){
@@ -115,7 +117,7 @@ public class GLES20Util extends abstractGLES20Util {
 								 int vertexBufferObject,int normalBufferObject,int indexBufferObject,int indexCount){
 		Matrix.setIdentityM(modelMatrix, 0);
 		Matrix.setIdentityM(invertMatrix,0);
-		Matrix.setIdentityM(normalMatrix,0);
+		Matrix.setIdentityM(normalMatrix, 0);
 
 		Matrix.translateM(modelMatrix, 0, x, y, z);
 		Matrix.scaleM(modelMatrix, 0, scaleX, scaleY, scaleZ);
@@ -127,22 +129,26 @@ public class GLES20Util extends abstractGLES20Util {
 		setShaderModelMatrix(modelMatrix);
 		setShaderNormalMatrix(normalMatrix);
 
-		setOnTexture(texture, 1.0f);
+		setOnTexture(texture, 1f);
 
 		GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vertexBufferObject);
 		GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
-		GLES20.glVertexAttribPointer(ma_Position, 3, GLES20.GL_FLOAT, false, 0, 0);
+		GLES20.glVertexAttribPointer(ma_Position, 3, GLES20.GL_FLOAT, false, FSIZE * 8, 0);
 		GLES20.glEnableVertexAttribArray(ma_Position);  // バッファオブジェクトの割り当ての有効化
 
-		GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, normalBufferObject);
-		GLES20.glVertexAttribPointer(va_Normal, 3, GLES20.GL_FLOAT, false, 0, 0);
+		GLES20.glVertexAttribPointer(va_Normal, 3, GLES20.GL_FLOAT, false, FSIZE*8, FSIZE*3);
 		GLES20.glEnableVertexAttribArray(va_Normal);
+
+		//テクスチャの有効化
+		GLES20.glVertexAttribPointer(ma_texCoord, 2, GLES20.GL_FLOAT, false, FSIZE*8, FSIZE*6);
+		GLES20.glEnableVertexAttribArray(ma_texCoord);  // バッファオブジェクトの割り当ての有効化
 
 		GLES20.glLineWidth(4.0f);
 		GLES20.glDrawElements(GLES20.GL_TRIANGLES, indexCount, GLES20.GL_UNSIGNED_INT, 0);
 		//GLES20.glDrawArrays(GLES20.GL_LINE_STRIP,0,8);
 		GLES20.glDisableVertexAttribArray(ma_Position);
 		GLES20.glDisableVertexAttribArray(va_Normal);
+		GLES20.glDisableVertexAttribArray(ma_texCoord);
 	}
 
 	public static void DrawGraph(float startX,float startY,float lengthX,float lengthY,Image img){

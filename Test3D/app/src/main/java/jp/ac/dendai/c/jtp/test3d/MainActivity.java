@@ -10,8 +10,11 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.io.File;
+
+import jp.ac.dendai.c.jtp.Graphics.ImageReader;
 import jp.ac.dendai.c.jtp.Graphics.Model;
-import jp.ac.dendai.c.jtp.ModelConverter.WavefrontObjConverter;
+import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FpsController;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
@@ -30,6 +33,12 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
 
         // GLSurfaceViewをこのアプリケーションの画面として使用する
         setContentView(glSurfaceView);
+
+        //ファイルマネージャを使えるようにする
+        FileManager.initFileManager(this);
+
+        //イメージリーダーを使えるようにする
+        ImageReader.initImageReader(this);
 
         Log.d("onCreate", "onCreate finished");}
 
@@ -57,11 +66,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         String fragmentShader = new String(FileManager.readShaderFile(this,"FSHADER.txt"));
         GLES20Util.initGLES20Util(vertexShader,fragmentShader);
 
-        mode = WavefrontObjConverter.createModel(FileManager.readShaderFile(this,"cube.obj"));
-        mode.setVertexBufferObject(GLES20Util.createBufferObject(1)[0]);
-        mode.setIndexBufferObject(GLES20Util.createBufferObject(1)[0]);
-        mode.setNormalBufferObject(GLES20Util.createBufferObject(1)[0]);
-
+        mode = Model.createModel(WavefrontObjConverter.createModel("monky.obj"));
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f); // 画面をクリアする色を設定する
     }
     private void process(){
@@ -71,23 +76,17 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     private void draw(){
         // 描画領域をクリアする
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-        /*if(count < 120) {
-            GLES20Util.DrawBox(0, 0, 1f, 1f, 255, 0, 0, 255);
-        }else{
-            mode.draw(0,0,0,0.1f,0.1f,0.1f,0,0,0);
-            if(count > 240){
-                count = 0;
-            }
+        if(count % 60 == 0) {
+            Log.d("FPS",String.valueOf(fpsController.getFps()));
         }
-        count++;*/
-        mode.draw(0,0,0,1f,1f,1f,0,0,count%(360*2));
         count++;
+        mode.draw(0,0,0,1f,1f,1f,0,0,count%360);
         /*
         //文字の描画
         GLES20Util.DrawString("Hello OpenGLES2.0!!", 1, 255, 255, 255,1f, 0, 0, GLES20COMPOSITIONMODE.ALPHA);
         GLES20Util.DrawString("Hello OpenGLES2.0!!", 1, 255, 255, 255,1f, 0.05f, 0,GLES20COMPOSITIONMODE.ALPHA);
         */
         //FPSの表示
-        //GLES20Util.DrawFPS(0, 0, fpsController.getFps(), fpsImage, 0.5f);
+        //GLES20Util.DrawFPS(0, 1.0f, fpsController.getFps(), fpsImage, 0.5f);
     }
 }
