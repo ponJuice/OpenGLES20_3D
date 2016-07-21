@@ -116,12 +116,18 @@ public class GLES20Util extends abstractGLES20Util {
 								 Bitmap texture,
 								 int vertexBufferObject,int normalBufferObject,int indexBufferObject,int indexCount){
 		Matrix.setIdentityM(modelMatrix, 0);
-		Matrix.setIdentityM(invertMatrix,0);
+		Matrix.setIdentityM(invertMatrix, 0);
 		Matrix.setIdentityM(normalMatrix, 0);
 
 		Matrix.translateM(modelMatrix, 0, x, y, z);
-		Matrix.scaleM(modelMatrix, 0, scaleX, scaleY, scaleZ);
-		Matrix.rotateM(modelMatrix, 0, degreeZ, 0, 0, 1);
+		if(scaleX != 0 || scaleY != 0 || scaleZ != 0)
+			Matrix.scaleM(modelMatrix, 0, scaleX, scaleY, scaleZ);
+		if(degreeX != 0)
+			Matrix.rotateM(modelMatrix, 0, degreeX, 1, 0, 0);
+		if(degreeY != 0)
+			Matrix.rotateM(modelMatrix, 0, degreeY, 0, 1, 0);
+		if(degreeZ != 0)
+			Matrix.rotateM(modelMatrix, 0, degreeZ, 0, 0, 1);
 
 		Matrix.invertM(invertMatrix, 0, modelMatrix, 0);
 		Matrix.transposeM(normalMatrix, 0, invertMatrix, 0);
@@ -136,7 +142,7 @@ public class GLES20Util extends abstractGLES20Util {
 		GLES20.glVertexAttribPointer(ma_Position, 3, GLES20.GL_FLOAT, false, FSIZE * 8, 0);
 		GLES20.glEnableVertexAttribArray(ma_Position);  // バッファオブジェクトの割り当ての有効化
 
-		GLES20.glVertexAttribPointer(va_Normal, 3, GLES20.GL_FLOAT, false, FSIZE*8, FSIZE*3);
+		GLES20.glVertexAttribPointer(va_Normal, 3, GLES20.GL_FLOAT, true, FSIZE*8, FSIZE*3);
 		GLES20.glEnableVertexAttribArray(va_Normal);
 
 		//テクスチャの有効化

@@ -135,7 +135,7 @@ public class WavefrontObjConverter {
 				(Integer[])n_indices.toArray(new Integer[0]),
 				(Integer[])t_indices.toArray(new Integer[0]),
 				matelials.get(matelialName)));
-       return models.toArray(new ModelObject[0]);
+	       return models.toArray(new ModelObject[0]);
 	}
 	public static String createModelFile(Model model){
 		StringBuilder sb = new StringBuilder();

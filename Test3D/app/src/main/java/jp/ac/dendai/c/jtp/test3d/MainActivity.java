@@ -66,7 +66,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         String fragmentShader = new String(FileManager.readShaderFile(this,"FSHADER.txt"));
         GLES20Util.initGLES20Util(vertexShader,fragmentShader);
 
-        mode = Model.createModel(WavefrontObjConverter.createModel("monky.obj"));
+        mode = Model.createModel(WavefrontObjConverter.createModel("houdai.obj"));
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f); // 画面をクリアする色を設定する
     }
     private void process(){
@@ -80,7 +80,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
             Log.d("FPS",String.valueOf(fpsController.getFps()));
         }
         count++;
-        mode.draw(0,0,0,1f,1f,1f,0,0,count%360);
+        mode.draw(0,0,0,1f,1f,1f,0,count%360,0);
         /*
         //文字の描画
         GLES20Util.DrawString("Hello OpenGLES2.0!!", 1, 255, 255, 255,1f, 0, 0, GLES20COMPOSITIONMODE.ALPHA);
