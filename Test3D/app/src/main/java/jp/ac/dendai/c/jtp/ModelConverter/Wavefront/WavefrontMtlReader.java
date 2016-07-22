@@ -24,24 +24,24 @@ public class WavefrontMtlReader {
                 matelials.get(targetMatelial).Ns = Float.valueOf(content[1]);
             }else if(content[0].equals("Ka")){
                 //アンビエント
-                matelials.get(targetMatelial).a_r = Float.valueOf(content[1]);
-                matelials.get(targetMatelial).a_g = Float.valueOf(content[2]);
-                matelials.get(targetMatelial).a_b = Float.valueOf(content[3]);
+                matelials.get(targetMatelial).ambient[Matelial.r] = Float.valueOf(content[1]);
+                matelials.get(targetMatelial).ambient[Matelial.g] = Float.valueOf(content[2]);
+                matelials.get(targetMatelial).ambient[Matelial.b] = Float.valueOf(content[3]);
             }else if(content[0].equals("Kb")){
                 //デフューズ
-                matelials.get(targetMatelial).d_r = Float.valueOf(content[1]);
-                matelials.get(targetMatelial).d_g = Float.valueOf(content[2]);
-                matelials.get(targetMatelial).d_b = Float.valueOf(content[3]);
+                matelials.get(targetMatelial).diffuse[Matelial.r] = Float.valueOf(content[1]);
+                matelials.get(targetMatelial).diffuse[Matelial.g] = Float.valueOf(content[2]);
+                matelials.get(targetMatelial).diffuse[Matelial.b] = Float.valueOf(content[3]);
             }else if(content[0].equals("Ks")){
                 //スペキュラー
-                matelials.get(targetMatelial).s_r = Float.valueOf(content[1]);
-                matelials.get(targetMatelial).s_g = Float.valueOf(content[2]);
-                matelials.get(targetMatelial).s_b = Float.valueOf(content[3]);
+                matelials.get(targetMatelial).specular[Matelial.r] = Float.valueOf(content[1]);
+                matelials.get(targetMatelial).specular[Matelial.g] = Float.valueOf(content[2]);
+                matelials.get(targetMatelial).specular[Matelial.b] = Float.valueOf(content[3]);
             }else if(content[0].equals("Ke")){
                 //スペキュラー
-                matelials.get(targetMatelial).e_r = Float.valueOf(content[1]);
-                matelials.get(targetMatelial).e_g = Float.valueOf(content[2]);
-                matelials.get(targetMatelial).e_b = Float.valueOf(content[3]);
+                matelials.get(targetMatelial).emmision[Matelial.r] = Float.valueOf(content[1]);
+                matelials.get(targetMatelial).emmision[Matelial.g] = Float.valueOf(content[2]);
+                matelials.get(targetMatelial).emmision[Matelial.b] = Float.valueOf(content[3]);
             }else if(content[0].equals("d")) {
                 //ディゾルブ
                 matelials.get(targetMatelial).d = Float.valueOf(content[1]);

@@ -9,12 +9,17 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 
 import java.io.File;
 
 import jp.ac.dendai.c.jtp.Graphics.ImageReader;
+import jp.ac.dendai.c.jtp.Graphics.Line.Line;
 import jp.ac.dendai.c.jtp.Graphics.Model;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
+import jp.ac.dendai.c.jtp.TouchUtil.Input;
+import jp.ac.dendai.c.jtp.TouchUtil.Touch;
+import jp.ac.dendai.c.jtp.TouchUtil.TouchListener;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FpsController;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
@@ -22,8 +27,67 @@ import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     private FpsController fpsController = new FpsController((short)60);
     public static Bitmap[] fpsImage = new Bitmap[10];
-    private int[] v_obj = new int[1],i_obj = new int[1];
+    private float rotateX = 0 ,rotateY = 0;
     private Model mode;
+    private Line line;
+    private Touch touch;
+
+    private float[] lineX = new float[]{0,0,0,
+                                            500,0,0};
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        int eventAction = event.getActionMasked();
+        int pointerIndex = event.getActionIndex();
+        int pointerId = event.getPointerId(pointerIndex);
+        int ptrIndex = event.findPointerIndex(pointerId);
+        Touch temp;
+
+        switch (eventAction) {
+            case MotionEvent.ACTION_DOWN:
+                Input.addTouchCount();
+                (Input.getTouch()).setTouch(event.getX(ptrIndex), event.getY(ptrIndex), pointerId);
+                break;
+
+            case MotionEvent.ACTION_POINTER_DOWN:
+                Input.addTouchCount();
+                if(Input.getTouchCount() <= Input.getMaxTouch()){
+                    (Input.getTouch()).setTouch(event.getX(ptrIndex), event.getY(ptrIndex), pointerId);
+                }
+                break;
+
+            case MotionEvent.ACTION_POINTER_UP:
+                Input.subTouchCount();
+                if((temp = Input.getTouch(pointerId)) != null){
+                    temp.removeTouch();
+                }
+                break;
+
+            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_UP:
+                Input.subTouchCount();
+                if((temp = Input.getTouch(pointerId)) != null){
+                    temp.removeTouch();
+                }
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                //どれか一つでも移動された場合、全てのタッチ位置を更新する
+                for(int n=0;n < Input.getMaxTouch();n++){
+                    if((temp = Input.getTouchArray()[n]).getTouchID() != -1){
+                        temp.updatePosition(event.getX(event.findPointerIndex(temp.getTouchID())),event.getY(event.findPointerIndex(temp.getTouchID())));
+                    }
+                }
+                break;
+        }
+        //pointerInfo.setText("pointerID:"+pointerId+" pointerIndex:"+pointerIndex+" ptrIndex:"+ptrIndex);
+        //count.setText("count : " + Input.getTouchCount());
+        //text1.setText(Input.getTouchArray()[0].toString());
+        //text2.setText(Input.getTouchArray()[1].toString());
+        return true;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +103,16 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
 
         //イメージリーダーを使えるようにする
         ImageReader.initImageReader(this);
+
+        //タッチマネージャーを使えるようにする
+        Input.setMaxTouch(1);
+        Input.getTouchArray()[0].addTouchListener(new TouchListener() {
+            @Override
+            public void execute(Touch t) {
+                rotateX += t.getDelta(Touch.Pos_Flag.X);
+                rotateY += t.getDelta(Touch.Pos_Flag.Y);
+            }
+        });
 
         Log.d("onCreate", "onCreate finished");}
 
@@ -67,6 +141,8 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         GLES20Util.initGLES20Util(vertexShader,fragmentShader);
 
         mode = Model.createModel(WavefrontObjConverter.createModel("houdai.obj"));
+        line = new Line(1f,0,0);
+
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f); // 画面をクリアする色を設定する
     }
     private void process(){
@@ -80,7 +156,10 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
             Log.d("FPS",String.valueOf(fpsController.getFps()));
         }
         count++;
-        mode.draw(0,0,0,1f,1f,1f,0,count%360,0);
+        //Log.d("Touch",Input.getTouchArray()[0].toString());
+        line.draw(0,0,0,50f,0,0);
+        mode.draw(0, 0, 0, 1f, 1f, 1f, rotateY, rotateX, 0);
+
         /*
         //文字の描画
         GLES20Util.DrawString("Hello OpenGLES2.0!!", 1, 255, 255, 255,1f, 0, 0, GLES20COMPOSITIONMODE.ALPHA);

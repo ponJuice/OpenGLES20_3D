@@ -35,7 +35,7 @@ public class ModelObject {
 
         this.matelial = matelial;
         if(matelial.texture == null)
-            matelial.texture = GLES20Util.createBitmap((int)(matelial.d_r*255),(int)(matelial.d_r*255),(int)(matelial.d_r*255),(int)(matelial.d*255));
+            matelial.texture = GLES20Util.createBitmap((int)(matelial.diffuse[0]*255),(int)(matelial.diffuse[0]*255),(int)(matelial.diffuse[0]*255),(int)(matelial.d*255));
     }
     public ModelObject(String modelName,String useMatelialName,Float[] vertex,Float[] normal,Float[] texture,
                  Integer[] v_indices,Integer[]  n_indices, Integer[]  t_indices,Matelial matelial){
@@ -50,7 +50,7 @@ public class ModelObject {
 
         this.matelial = matelial;
         if(matelial.texture == null)
-            matelial.texture = GLES20Util.createBitmap((int)(matelial.d_r*255),(int)(matelial.d_r*255),(int)(matelial.d_r*255),(int)(matelial.d*255));
+            matelial.texture = GLES20Util.createBitmap((int)(matelial.diffuse[0]*255),(int)(matelial.diffuse[0]*255),(int)(matelial.diffuse[0]*255),(int)(matelial.d*255));
     }
 
     public void setVertexBufferObject(int object){
@@ -67,6 +67,7 @@ public class ModelObject {
     }
 
     public void draw(float x,float y,float z,float scaleX,float scaleY,float scaleZ,float degreeX,float degreeY,float degreeZ){
+        GLES20Util.setEmmision(matelial.emmision);
         GLES20Util.DrawModel(x, y, z, scaleX, scaleY, scaleZ, degreeX, degreeY, degreeZ, matelial.texture, vertexBufferObject,normalBufferObject, indexBufferObject, v_indices.limit());
     }
 }

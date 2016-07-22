@@ -10,6 +10,8 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
+import java.nio.FloatBuffer;
+
 import jp.ac.dendai.c.jtp.openglesutil.graphic.Image;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
@@ -18,6 +20,10 @@ public class GLES20Util extends abstractGLES20Util {
 	private static Paint paint;
 	private static Canvas canvas;
 	private static Rect rect = new Rect(0,0,0,0);
+	private static float[] line = new float[]{
+			0,0,0,0,0,1,0,0,
+			1,1,1,0,0,1,0,0
+	};
 	public enum GLES20UTIL_MODE{
 		POSX,
 		POSY
@@ -91,12 +97,39 @@ public class GLES20Util extends abstractGLES20Util {
 		GLES20.glDisableVertexAttribArray(ma_Position);
 	}
 
+	public static void DrawLine(FloatBuffer vertex,float x,float y,float z,float lengthX,float lengthY,float lengthZ,float[] color,float a,float width,GLES20COMPOSITIONMODE mode){
+		Matrix.setIdentityM(normalMatrix,0);
+		Matrix.setIdentityM(modelMatrix, 0);
+		Matrix.translateM(modelMatrix, 0, x, y, z);
+		Matrix.scaleM(modelMatrix, 0, lengthX, lengthY, lengthZ);
+		setShaderModelMatrix(modelMatrix);
+		setShaderNormalMatrix(normalMatrix);
+		setEmmision(color);
+		setOnTexture(null, a);
+		mode.setBlendMode();
+		GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+		GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER,0);
+		GLES20.glLineWidth(width);
+		GLES20.glVertexAttribPointer(ma_Position, 3, GLES20.GL_FLOAT, false, FSIZE * 8, vertex.position(0));
+		GLES20.glVertexAttribPointer(va_Normal, 3, GLES20.GL_FLOAT, true, FSIZE * 8, vertex.position(3));
+		vertex.position(6);
+		GLES20.glVertexAttribPointer(ma_texCoord, 2, GLES20.GL_FLOAT, true, FSIZE * 8, vertex.position(6));
+		GLES20.glEnableVertexAttribArray(ma_Position);
+		GLES20.glEnableVertexAttribArray(va_Normal);
+		GLES20.glEnableVertexAttribArray(ma_texCoord);
+		GLES20.glDrawArrays(GLES20.GL_LINE_STRIP, 0, 2);
+		GLES20.glDisableVertexAttribArray(ma_Position);
+		GLES20.glDisableVertexAttribArray(va_Normal);
+		GLES20.glDisableVertexAttribArray(ma_texCoord);
+	}
+
 	public static void DrawGraph(float startX,float startY,float lengthX,float lengthY,float degree,Bitmap image,float alpha,GLES20COMPOSITIONMODE mode){
 		float scaleX = lengthX;
 		float scaleY = lengthY;
 
 		//float[] modelMatrix = new float[16];
 		Matrix.setIdentityM(modelMatrix, 0);
+		Matrix.setIdentityM(normalMatrix, 0);
 		Matrix.translateM(modelMatrix, 0, startX, startY, 0.0f);
 		Matrix.scaleM(modelMatrix, 0, scaleX, scaleY, 1.0f);
 		Matrix.rotateM(modelMatrix, 0, degree, 0, 0, 1);

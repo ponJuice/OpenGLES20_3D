@@ -89,6 +89,9 @@ public abstract class abstractGLES20Util {
 	protected static int vu_LightColor;
 	protected static int vu_LightDirection;
 	protected static int mu_NormalMatrix;
+	protected static int vu_emmision;
+
+	protected static Bitmap white;
 	/**
 	 * サンプラーの場所
 	 */
@@ -207,7 +210,7 @@ public abstract class abstractGLES20Util {
 	public static void initGLES20Util(String vertexShaderString,String fragmentShaderString){
 		//シェーダの準備
 		initShader(vertexShaderString, fragmentShaderString);
-		Log.d("abstractGLES20Util","finished init shader");
+		Log.d("abstractGLES20Util", "finished init shader");
 		//バッファの準備
 		initBuffer();
 		Log.d("abstractGLES20Util","finished initBuffer");
@@ -223,6 +226,9 @@ public abstract class abstractGLES20Util {
 		//裏面を表示しない
 		GLES20.glEnable(GLES20.GL_CULL_FACE);
 		GLES20.glCullFace(GLES20.GL_BACK);
+
+		//デフォルトテクスチャ作成
+		white = createBitmap(255,255,255,255);
 	}
 
 	/**
@@ -347,7 +353,7 @@ public abstract class abstractGLES20Util {
 			throw new RuntimeException("u_ModelMatrixの格納場所の取得に失敗");
 		}
 		//テクスチャの格納場所を取得
-		ma_texCoord = GLES20.glGetAttribLocation(program,"a_TexCoord");
+		ma_texCoord = GLES20.glGetAttribLocation(program, "a_TexCoord");
 		if (ma_texCoord == -1) {
 			throw new RuntimeException("a_texCoordの格納場所の取得に失敗");
 		}
@@ -357,7 +363,7 @@ public abstract class abstractGLES20Util {
 			throw new RuntimeException("a_Normalの格納場所の取得に失敗");
 		}
 		//ライトの色
-		vu_LightColor = GLES20.glGetUniformLocation(program,"u_LightColor");
+		vu_LightColor = GLES20.glGetUniformLocation(program, "u_LightColor");
 		if(vu_LightColor == -1){
 			throw new RuntimeException("u_LightColorの格納場所の取得に失敗");
 		}
@@ -369,6 +375,10 @@ public abstract class abstractGLES20Util {
 		mu_NormalMatrix = GLES20.glGetUniformLocation(program,"u_NormalMatrix");
 		if(mu_NormalMatrix == -1){
 			throw new RuntimeException("mu_NormalMatrixの格納場所の取得に失敗");
+		}
+		vu_emmision = GLES20.glGetUniformLocation(program,"u_emmision");
+		if(vu_emmision == -1){
+			throw new RuntimeException("u_emmisionの格納場所の取得に失");
 		}
 	}
 
@@ -442,7 +452,7 @@ public abstract class abstractGLES20Util {
 	 * ユーザーが定義する頂点バッファオブジェクトを消去する
 	 */
 	public static void deleteBufferObject(int[] objects){
-		GLES20.glDeleteBuffers(objects.length,objects,0);
+		GLES20.glDeleteBuffers(objects.length, objects, 0);
 	}
 
 	/**
@@ -455,7 +465,7 @@ public abstract class abstractGLES20Util {
 	 */
 	public static int[] createBufferObject(int num){
 		int[] buffers = new int[num];
-		GLES20.glGenBuffers(num,buffers,0);
+		GLES20.glGenBuffers(num, buffers, 0);
 		return buffers;
 	}
 
@@ -532,8 +542,12 @@ public abstract class abstractGLES20Util {
 	   */
 	  //テクスチャ画像を設定する
 	  protected static void setOnTexture(Bitmap image,float alpha){
-		    // テクスチャ画像を設定する
-		    GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
+		  if(image == null){
+			  GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, white, 0);
+		  }else {
+			  // テクスチャ画像を設定する
+			  GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
+		  }
 
 		    GLES20.glUniform1f(u_alpha, alpha);		//サンプラにアルファを設定する
 		    GLES20.glUniform1i(u_Sampler, 0);     // サンプラにテクスチャユニットを設定する
@@ -608,7 +622,7 @@ public abstract class abstractGLES20Util {
 		float[] viewMatrix = new float[16];
 		if(Perspective){
 			setPerspectiveM(u_ProjMatrix,0,40.0,(double)width/height,1.0,100.0);
-		    Matrix.setLookAtM(viewMatrix, 0, -5f, 5f, 5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+		    Matrix.setLookAtM(viewMatrix, 0, -10f, 10f, 10f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 		    Matrix.multiplyMM(viewProjMatrix, 0, u_ProjMatrix, 0, viewMatrix, 0);
 		}
 		else{
@@ -629,6 +643,10 @@ public abstract class abstractGLES20Util {
 
 		//デバッグ
 		Log.d("GLES20Util:Width",String.valueOf(aspect));
+	}
+
+	public static void setEmmision(float[] emmision){
+		GLES20.glUniform3fv(vu_emmision,1,emmision,0);
 	}
 
 	public static void normalizeVector3(float[] vec){

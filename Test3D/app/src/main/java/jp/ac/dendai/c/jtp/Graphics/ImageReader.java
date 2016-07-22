@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 
 /**
@@ -25,11 +26,13 @@ public class ImageReader {
         final AssetManager assetManager = _act.getAssets();
         BufferedInputStream bis = null;
         try {
-            bis = new BufferedInputStream(assetManager.open(fileName));
+            InputStream is = assetManager.open(fileName);
+            bis = new BufferedInputStream(is);
             Bitmap b = BitmapFactory.decodeStream(bis);
             images.put(fileName,b);
             return b;
         }catch(IOException e){
+            e.printStackTrace();
             throw  new RuntimeException(fileName+"の読み込みに失敗しました");
         }finally {
             try {

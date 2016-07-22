@@ -6,10 +6,20 @@ import android.graphics.Bitmap;
  * Created by Goto on 2016/07/21.
  */
 public class Matelial {
+    public final static int r = 0;
+    public final static int g = 1;
+    public final static int b = 2;
+    public float[] emmision;
+    public float[] diffuse;
+    public float[] specular;
+    public float[] ambient;
     public Bitmap texture;
-    public float d_r,d_g,d_b;
-    public float s_r,s_g,s_b;
-    public float a_r,a_g,a_b;
-    public float e_r,e_g,e_b;
     public float Ns,d;
+    public Matelial(){
+        emmision = new float[3];
+        diffuse = new float[3];
+        specular = new float[3];
+        ambient = new float[3];
+        texture = null;
+    }
 }
