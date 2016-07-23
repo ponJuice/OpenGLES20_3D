@@ -1,15 +1,11 @@
 package jp.ac.dendai.c.jtp.ModelConverter.Wavefront;
 
-import android.util.Log;
-
-import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.TreeMap;
 
 import jp.ac.dendai.c.jtp.Graphics.Matelial;
-import jp.ac.dendai.c.jtp.Graphics.Model;
-import jp.ac.dendai.c.jtp.Graphics.ModelObject;
+import jp.ac.dendai.c.jtp.Graphics.Model.Model;
+import jp.ac.dendai.c.jtp.Graphics.Model.ModelObject;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 
 public class WavefrontObjConverter {

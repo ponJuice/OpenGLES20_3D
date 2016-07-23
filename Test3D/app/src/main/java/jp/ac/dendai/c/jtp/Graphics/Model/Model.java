@@ -1,7 +1,4 @@
-package jp.ac.dendai.c.jtp.Graphics;
-
-import android.graphics.Bitmap;
-import android.opengl.GLES20;
+package jp.ac.dendai.c.jtp.Graphics.Model;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

@@ -1,11 +1,11 @@
-package jp.ac.dendai.c.jtp.Graphics;
+package jp.ac.dendai.c.jtp.Graphics.Model;
 
-import android.graphics.Bitmap;
 import android.opengl.GLES20;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import jp.ac.dendai.c.jtp.Graphics.Matelial;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
 /**

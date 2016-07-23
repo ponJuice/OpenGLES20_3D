@@ -11,11 +11,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 
-import java.io.File;
-
 import jp.ac.dendai.c.jtp.Graphics.ImageReader;
 import jp.ac.dendai.c.jtp.Graphics.Line.Line;
-import jp.ac.dendai.c.jtp.Graphics.Model;
+import jp.ac.dendai.c.jtp.Graphics.Model.Model;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
 import jp.ac.dendai.c.jtp.TouchUtil.Input;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
@@ -29,11 +27,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     public static Bitmap[] fpsImage = new Bitmap[10];
     private float rotateX = 0 ,rotateY = 0;
     private Model mode;
-    private Line line;
-    private Touch touch;
-
-    private float[] lineX = new float[]{0,0,0,
-                                            500,0,0};
+    private Line line_x,line_y,line_z;
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
@@ -109,8 +103,8 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         Input.getTouchArray()[0].addTouchListener(new TouchListener() {
             @Override
             public void execute(Touch t) {
-                rotateX += t.getDelta(Touch.Pos_Flag.X);
-                rotateY += t.getDelta(Touch.Pos_Flag.Y);
+                rotateY += t.getDelta(Touch.Pos_Flag.X)*0.1f;
+                rotateX += t.getDelta(Touch.Pos_Flag.Y)*0.1f;
             }
         });
 
@@ -141,7 +135,9 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         GLES20Util.initGLES20Util(vertexShader,fragmentShader);
 
         mode = Model.createModel(WavefrontObjConverter.createModel("houdai.obj"));
-        line = new Line(1f,0,0);
+        line_x = new Line(1f,0,0);
+        line_y = new Line(0,1f,0);
+        line_z = new Line(0,0,1f);
 
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f); // 画面をクリアする色を設定する
     }
@@ -157,8 +153,10 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         }
         count++;
         //Log.d("Touch",Input.getTouchArray()[0].toString());
-        line.draw(0,0,0,50f,0,0);
-        mode.draw(0, 0, 0, 1f, 1f, 1f, rotateY, rotateX, 0);
+        line_x.draw(0,0,0,50f,0,0);
+        line_y.draw(0,0,0,0,50f,0);
+        line_z.draw(0,0,0,0,0,50f);
+        mode.draw(0, 0, 0, 1f, 1f, 1f, rotateX, rotateY, 0);
 
         /*
         //文字の描画
