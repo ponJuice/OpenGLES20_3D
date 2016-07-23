@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.ImageReader;
 import jp.ac.dendai.c.jtp.Graphics.Line.Line;
 import jp.ac.dendai.c.jtp.Graphics.Model.Model;
@@ -28,6 +29,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     private float rotateX = 0 ,rotateY = 0;
     private Model mode;
     private Line line_x,line_y,line_z;
+    private Camera camera;
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
@@ -103,8 +105,10 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         Input.getTouchArray()[0].addTouchListener(new TouchListener() {
             @Override
             public void execute(Touch t) {
-                rotateY += t.getDelta(Touch.Pos_Flag.X)*0.1f;
-                rotateX += t.getDelta(Touch.Pos_Flag.Y)*0.1f;
+                //rotateY += t.getDelta(Touch.Pos_Flag.X) * 0.1f;
+                //rotateX += t.getDelta(Touch.Pos_Flag.Y) * 0.1f;
+                camera.setAngleOfView(camera.getAngleOfView()+(t.getDelta(Touch.Pos_Flag.Y) * 0.01f));
+                camera.addPosition(-t.getDelta(Touch.Pos_Flag.X) * 0.1f,t.getDelta(Touch.Pos_Flag.X) * 0.1f,t.getDelta(Touch.Pos_Flag.X) * 0.1f);
             }
         });
 
@@ -138,6 +142,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         line_x = new Line(1f,0,0);
         line_y = new Line(0,1f,0);
         line_z = new Line(0,0,1f);
+        camera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,-5f,5f,5f);
 
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f); // 画面をクリアする色を設定する
     }
@@ -148,13 +153,14 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     private void draw(){
         // 描画領域をクリアする
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+        camera.updateCamera();
         if(count % 60 == 0) {
             Log.d("FPS",String.valueOf(fpsController.getFps()));
         }
         count++;
         //Log.d("Touch",Input.getTouchArray()[0].toString());
         line_x.draw(0,0,0,50f,0,0);
-        line_y.draw(0,0,0,0,50f,0);
+        line_y.draw(0, 0, 0, 0, 50f, 0);
         line_z.draw(0,0,0,0,0,50f);
         mode.draw(0, 0, 0, 1f, 1f, 1f, rotateX, rotateY, 0);
 

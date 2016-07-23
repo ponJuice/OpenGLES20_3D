@@ -52,21 +52,21 @@ public abstract class abstractGLES20Util {
 	/**
 	 * 画面の幅
 	 */
-	private static int Width;						//画面の幅(デバイスの解像度)
+	protected static int Width;						//画面の幅(デバイスの解像度)
 	/**
 	 * 画面の高さ
 	 */
-	private static int Height;						//画面の高さ(デバイスの解像度)
+	protected static int Height;						//画面の高さ(デバイスの解像度)
 
 	/**
 	 * 画面の幅（GL空間）
 	 */
-	private static float width_gl;
+	protected static float width_gl;
 
 	/**
 	 * 画面の高さ(GL空間)
 	 */
-	private static float height_gl;
+	protected static float height_gl;
 
 	/**
 	 * 頂点シェーダの頂点座標の格納場所
@@ -116,11 +116,11 @@ public abstract class abstractGLES20Util {
 	/**
 	 * 投影行列
 	 */
-	private static float[] u_ProjMatrix = new float[16];	//投影行列
+	protected static float[] u_ProjMatrix = new float[16];	//投影行列
 	/**
 	 * ビューポート行列
 	 */
-	private static float[] viewProjMatrix = new float[16];	//ビューポート行列
+	protected static float[] viewProjMatrix = new float[16];	//ビューポート行列
 	//private static float[] modelMatrix = new float[16];		//モデル行列
 	/**
 	 *
@@ -386,7 +386,7 @@ public abstract class abstractGLES20Util {
 	 * シェーダにビューポート行列を設定
 	 */
 	//シェーダにビューポート行列を設定
-	private static void setShaderProjMatrix(){
+	protected static void setShaderProjMatrix(){
 		GLES20.glUniformMatrix4fv(mu_ProjMatrix, 1,false,viewProjMatrix,0);
 	}
 
@@ -657,7 +657,7 @@ public abstract class abstractGLES20Util {
 	}
 
 	//視体積の四角錐型の設定
-	private static void setPerspectiveM(float[] m, int offset, double fovy, double aspect, double zNear, double zFar) {
+	protected static void setPerspectiveM(float[] m, int offset, double fovy, double aspect, double zNear, double zFar) {
 		    Matrix.setIdentityM(m, offset);
 		    double ymax = zNear * Math.tan(fovy * Math.PI / 360.0);
 		    double ymin = -ymax;
