@@ -105,10 +105,10 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         Input.getTouchArray()[0].addTouchListener(new TouchListener() {
             @Override
             public void execute(Touch t) {
-                //rotateY += t.getDelta(Touch.Pos_Flag.X) * 0.1f;
-                //rotateX += t.getDelta(Touch.Pos_Flag.Y) * 0.1f;
-                camera.setAngleOfView(camera.getAngleOfView()+(t.getDelta(Touch.Pos_Flag.Y) * 0.01f));
-                camera.addPosition(-t.getDelta(Touch.Pos_Flag.X) * 0.1f,t.getDelta(Touch.Pos_Flag.X) * 0.1f,t.getDelta(Touch.Pos_Flag.X) * 0.1f);
+                rotateY += t.getDelta(Touch.Pos_Flag.X) * 0.1f;
+                rotateX += t.getDelta(Touch.Pos_Flag.Y) * 0.1f;
+                //camera.setAngleOfView(camera.getAngleOfView()+(t.getDelta(Touch.Pos_Flag.Y) * 0.01f));
+                //camera.addPosition(-t.getDelta(Touch.Pos_Flag.X) * 0.1f,t.getDelta(Touch.Pos_Flag.X) * 0.1f,t.getDelta(Touch.Pos_Flag.X) * 0.1f);
             }
         });
 
@@ -138,11 +138,11 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         String fragmentShader = new String(FileManager.readShaderFile(this,"FSHADER.txt"));
         GLES20Util.initGLES20Util(vertexShader,fragmentShader);
 
-        mode = Model.createModel(WavefrontObjConverter.createModel("houdai.obj"));
+        mode = Model.createModel(WavefrontObjConverter.createModel("untitled.obj"));
         line_x = new Line(1f,0,0);
         line_y = new Line(0,1f,0);
         line_z = new Line(0,0,1f);
-        camera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,-5f,5f,5f);
+        camera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,-10f,10f,10f);
 
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f); // 画面をクリアする色を設定する
     }

@@ -2,10 +2,13 @@ package jp.ac.dendai.c.jtp.Graphics;
 
 import android.graphics.Bitmap;
 
+import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
+
 /**
  * Created by Goto on 2016/07/21.
  */
 public class Matelial {
+    public int startFace,endFace;
     public final static int r = 0;
     public final static int g = 1;
     public final static int b = 2;
@@ -21,5 +24,9 @@ public class Matelial {
         specular = new float[3];
         ambient = new float[3];
         texture = null;
+    }
+    public void setMatelial(){
+        GLES20Util.setEmmision(emmision);
+        GLES20Util.setOnTexture(texture,d);
     }
 }

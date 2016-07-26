@@ -541,7 +541,7 @@ public abstract class abstractGLES20Util {
 	   * テクスチャ画像を設定する
 	   */
 	  //テクスチャ画像を設定する
-	  protected static void setOnTexture(Bitmap image,float alpha){
+	  public static void setOnTexture(Bitmap image,float alpha){
 		  if(image == null){
 			  GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, white, 0);
 		  }else {

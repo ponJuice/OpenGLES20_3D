@@ -13,6 +13,7 @@ import android.util.Log;
 import java.nio.FloatBuffer;
 
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
+import jp.ac.dendai.c.jtp.Graphics.Face;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.Image;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
@@ -175,8 +176,8 @@ public class GLES20Util extends abstractGLES20Util {
 	public static void DrawModel(float x,float y,float z,
 								 float scaleX,float scaleY, float scaleZ,
 								 float degreeX,float degreeY,float degreeZ,
-								 Bitmap texture,
-								 int vertexBufferObject,int normalBufferObject,int indexBufferObject,int indexCount){
+								 Face[] face,
+								 int vertexBufferObject,int indexBufferObject,int indexCount){
 		Matrix.setIdentityM(modelMatrix, 0);
 		Matrix.setIdentityM(invertMatrix, 0);
 		Matrix.setIdentityM(normalMatrix, 0);
@@ -197,26 +198,27 @@ public class GLES20Util extends abstractGLES20Util {
 		setShaderModelMatrix(modelMatrix);
 		setShaderNormalMatrix(normalMatrix);
 
-		setOnTexture(texture, 1f);
-
 		GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vertexBufferObject);
 		GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
 		GLES20.glVertexAttribPointer(ma_Position, 3, GLES20.GL_FLOAT, false, FSIZE * 8, 0);
 		GLES20.glEnableVertexAttribArray(ma_Position);  // バッファオブジェクトの割り当ての有効化
 
-		GLES20.glVertexAttribPointer(va_Normal, 3, GLES20.GL_FLOAT, true, FSIZE*8, FSIZE*3);
+		GLES20.glVertexAttribPointer(va_Normal, 3, GLES20.GL_FLOAT, true, FSIZE * 8, FSIZE * 3);
 		GLES20.glEnableVertexAttribArray(va_Normal);
 
 		//テクスチャの有効化
-		GLES20.glVertexAttribPointer(ma_texCoord, 2, GLES20.GL_FLOAT, false, FSIZE*8, FSIZE*6);
+		GLES20.glVertexAttribPointer(ma_texCoord, 2, GLES20.GL_FLOAT, false, FSIZE * 8, FSIZE * 6);
 		GLES20.glEnableVertexAttribArray(ma_texCoord);  // バッファオブジェクトの割り当ての有効化
 
-		GLES20.glLineWidth(4.0f);
-		GLES20.glDrawElements(GLES20.GL_TRIANGLES, indexCount, GLES20.GL_UNSIGNED_INT, 0);
+		for(int n = 0;n < face.length;n++) {
+			face[n].matelial.setMatelial();
+			GLES20.glDrawElements(GLES20.GL_TRIANGLES, face[n].end-face[n].offset, GLES20.GL_UNSIGNED_INT, face[n].offset);
+		}
 		//GLES20.glDrawArrays(GLES20.GL_LINE_STRIP,0,8);
 		GLES20.glDisableVertexAttribArray(ma_Position);
 		GLES20.glDisableVertexAttribArray(va_Normal);
 		GLES20.glDisableVertexAttribArray(ma_texCoord);
+
 	}
 
 	public static void DrawGraph(float startX,float startY,float lengthX,float lengthY,Image img){
