@@ -13,7 +13,7 @@ import android.util.Log;
 import java.nio.FloatBuffer;
 
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
-import jp.ac.dendai.c.jtp.Graphics.Face;
+import jp.ac.dendai.c.jtp.Graphics.Model.Face;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.Image;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
@@ -212,7 +212,7 @@ public class GLES20Util extends abstractGLES20Util {
 
 		for(int n = 0;n < face.length;n++) {
 			face[n].matelial.setMatelial();
-			GLES20.glDrawElements(GLES20.GL_TRIANGLES, face[n].end-face[n].offset, GLES20.GL_UNSIGNED_INT, face[n].offset);
+			GLES20.glDrawElements(GLES20.GL_TRIANGLES, face[n].end-face[n].offset+1, GLES20.GL_UNSIGNED_INT, ISIZE*face[n].offset);
 		}
 		//GLES20.glDrawArrays(GLES20.GL_LINE_STRIP,0,8);
 		GLES20.glDisableVertexAttribArray(ma_Position);

@@ -5,11 +5,10 @@ import android.util.Log;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import jp.ac.dendai.c.jtp.Graphics.Face;
-import jp.ac.dendai.c.jtp.Graphics.Matelial;
+import jp.ac.dendai.c.jtp.Graphics.Model.Face;
+import jp.ac.dendai.c.jtp.Graphics.Model.Matelial;
 import jp.ac.dendai.c.jtp.Graphics.Model.Model;
 import jp.ac.dendai.c.jtp.Graphics.Model.ModelObject;
-import jp.ac.dendai.c.jtp.Graphics.Model.ModelObjectTemplate;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 
 public class WavefrontObjConverter {
@@ -21,7 +20,6 @@ public class WavefrontObjConverter {
 		ObjNormalReader nr = new ObjNormalReader();
 		ObjUVReader ur = new ObjUVReader();
 		ObjIndexReader ir = new ObjIndexReader();
-		ModelObjectTemplate nowObject;
 		HashMap<String,Matelial> matelials = null;
 
 		//行で分割
@@ -35,7 +33,6 @@ public class WavefrontObjConverter {
 				//マテリアルを読み込む
 				matelials = WavefrontMtlReader.createMaterial(FileManager.readTextFile(charas[1]));
 			} else if (charas[0].equals("o")) {
-				nowObject = new ModelObjectTemplate();
 				vr.clear();
 				nr.clear();
 				ur.clear();

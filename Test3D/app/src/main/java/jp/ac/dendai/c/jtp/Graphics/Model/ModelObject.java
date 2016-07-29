@@ -6,8 +6,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.LinkedList;
 
-import jp.ac.dendai.c.jtp.Graphics.Face;
-import jp.ac.dendai.c.jtp.Graphics.Matelial;
 import jp.ac.dendai.c.jtp.TouchUtil.TouchListener;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 

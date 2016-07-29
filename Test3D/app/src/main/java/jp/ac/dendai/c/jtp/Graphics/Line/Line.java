@@ -2,7 +2,7 @@ package jp.ac.dendai.c.jtp.Graphics.Line;
 
 import java.nio.FloatBuffer;
 
-import jp.ac.dendai.c.jtp.Graphics.Matelial;
+import jp.ac.dendai.c.jtp.Graphics.Model.Matelial;
 import jp.ac.dendai.c.jtp.Graphics.Model.Model;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
