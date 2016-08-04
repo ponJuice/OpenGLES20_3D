@@ -1,5 +1,6 @@
 package jp.ac.dendai.c.jtp.Graphics.Camera;
 
+import android.opengl.GLES20;
 import android.opengl.Matrix;
 
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
@@ -71,6 +72,8 @@ public class Camera {
             update = false;
             persUpdate = false;
             posUpdate = false;
+        }else {
+            GLES20Util.setProjMatrix(cameraMatrix);
         }
     }
     public void setNear(float value){
@@ -128,5 +131,15 @@ public class Camera {
         double xmin = ymin * aspect;
         double xmax = ymax * aspect;
         Matrix.frustumM(m, offset, (float)xmin, (float)xmax, (float)ymin, (float)ymax, (float)zNear, (float)zFar);
+    }
+
+    private float[] uiCameraMatrix = new float[16];
+    private float[] transformMatrix = new float[16];
+    public void testUICamera(){
+        Matrix.setIdentityM(transformMatrix,0);
+        Matrix.translateM(transformMatrix, 0, -GLES20Util.getWidth_gl() / 2f, -GLES20Util.getHeight_gl() / 2f, 0);
+        Matrix.orthoM(uiCameraMatrix, 0, -GLES20Util.getAspect(), GLES20Util.getAspect(), -1.0f, 1.0f, mNear / 100, mFar / 100);
+        Matrix.multiplyMM(uiCameraMatrix, 0, uiCameraMatrix, 0, transformMatrix, 0);
+        GLES20Util.setProjMatrix(uiCameraMatrix);
     }
 }

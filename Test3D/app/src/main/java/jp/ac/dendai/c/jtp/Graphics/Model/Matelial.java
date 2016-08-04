@@ -3,6 +3,7 @@ package jp.ac.dendai.c.jtp.Graphics.Model;
 import android.graphics.Bitmap;
 
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
+import jp.ac.dendai.c.jtp.openglesutil.core.Shader.Shader;
 
 /**
  * Created by Goto on 2016/07/21.
@@ -16,17 +17,23 @@ public class Matelial {
     public float[] diffuse;
     public float[] specular;
     public float[] ambient;
-    public Bitmap texture;
+    public Bitmap tex_emmision;
+    public Bitmap tex_diffuse;
+    public Bitmap tex_specular;
+    public Bitmap tex_ambient;
+    public Shader shader;
     public float Ns,d;
     public Matelial(){
         emmision = new float[3];
         diffuse = new float[3];
         specular = new float[3];
         ambient = new float[3];
-        texture = null;
+        tex_ambient = null;
+        tex_diffuse = null;
+        tex_emmision = null;
+        tex_specular = null;
     }
-    public void setMatelial(){
-        GLES20Util.setEmmision(emmision);
-        GLES20Util.setOnTexture(texture,d);
+    public void setMaterial(){
+        shader.setMaterial(this);
     }
 }

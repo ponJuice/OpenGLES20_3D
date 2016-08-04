@@ -1,18 +1,17 @@
 //UTF-8N 改行コードCR+LFで保存すること
-#ifdef GL_ES
-precision mediump float;
-#endif
-uniform sampler2D u_Sampler;	//図形に貼るテクスチャ
-uniform float u_alpha;		//アルファ―値
-uniform vec3 u_emmision;    //エミッション
-varying vec2 v_TexCoord;	//頂点シェーダからテクスチャ座標を受け取る
-varying vec3 a_LightColor;
-varying float a_nDotL;
-void main() {
-  vec4 texColor = texture2D(u_Sampler,v_TexCoord);
-  vec3 diffuse = a_LightColor * texColor.rgb * a_nDotL;
-  diffuse += u_emmision;
-  gl_FragColor = vec4(diffuse,texColor.a);
-  gl_FragColor.a *= u_alpha;
-  //gl_FragColor = vec4(0.0, 1.0, 0.0, 0.5);
-}
+ #ifdef GL_ES
+ precision mediump float;
+ #endif
+ uniform sampler2D u_Sampler;	//図形に貼るテクスチャ
+ uniform float u_alpha;		//アルファ―値
+ uniform vec3 u_emmision;    //エミッション
+ varying vec2 v_TexCoord;	//頂点シェーダからテクスチャ座標を受け取る
+ varying vec3 a_LightColor;
+ varying float a_nDotL;
+ void main() {
+   vec4 texColor = texture2D(u_Sampler,v_TexCoord);
+   vec3 diffuse = a_LightColor * texColor.rgb * a_nDotL;
+   diffuse += u_emmision;
+   gl_FragColor = vec4(diffuse,texColor.a*u_alpha);
+   //gl_FragColor = vec4(0.0, 1.0, 0.0, 0.5);
+ }

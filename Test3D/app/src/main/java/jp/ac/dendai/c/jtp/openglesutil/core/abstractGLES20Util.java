@@ -31,8 +31,8 @@ public abstract class abstractGLES20Util {
 	/**
 	 * floatのバイト数
 	 */
-	protected static final int FSIZE = Float.SIZE / Byte.SIZE;//floatのバイト数
-	protected static final int ISIZE = Integer.SIZE / Byte.SIZE;
+	public static final int FSIZE = Float.SIZE / Byte.SIZE;//floatのバイト数
+	public static final int ISIZE = Integer.SIZE / Byte.SIZE;
 	/**
 	 * glSurfaceViewを使っているアクティビティ
 	 */
@@ -48,7 +48,7 @@ public abstract class abstractGLES20Util {
 	/**
 	 * プログラムオブジェクト
 	 */
-	private static int program;						//プログラムオブジェクト
+	protected static int program;						//プログラムオブジェクト
 	/**
 	 * 画面の幅
 	 */
@@ -91,7 +91,7 @@ public abstract class abstractGLES20Util {
 	protected static int mu_NormalMatrix;
 	protected static int vu_emmision;
 
-	protected static Bitmap white;
+	public final static Bitmap white;
 	/**
 	 * サンプラーの場所
 	 */
@@ -167,6 +167,10 @@ public abstract class abstractGLES20Util {
 
 	protected static float[] invertMatrix = new float[16];
 	protected static float[] normalMatrix = new float[16];
+
+	static{
+		white = createBitmap(255,255,255,255);
+	}
 
 	public static float getWidth(){
 		return Width;
@@ -252,7 +256,7 @@ public abstract class abstractGLES20Util {
 
 	    // プログラムオブジェクトをリンクする
 	   	GLES20.glLinkProgram(program);
-	   	Log.d("abstractGLES20Util","link Program finished");
+	   	Log.d("abstractGLES20Util", "link Program finished");
 
 	    // リンク結果をチェックする
 	    int[] linked = new int[1];
@@ -263,11 +267,11 @@ public abstract class abstractGLES20Util {
 	    }
 		//プログラムの使用開始
 		GLES20.glUseProgram(program);
-		Log.d("abstractGLES20Util","use stert Program finished");
+		Log.d("abstractGLES20Util", "use stert Program finished");
 
 		//シェーダ内の変数場所を取得
 		getShaderLocation();
-		Log.d("abstractGLES20Util","getShaderLocation finished");
+		Log.d("abstractGLES20Util", "getShaderLocation finished");
 
 		Log.d("abstractGLES20Util","end of initShader");
 
@@ -390,16 +394,28 @@ public abstract class abstractGLES20Util {
 		GLES20.glUniformMatrix4fv(mu_ProjMatrix, 1,false,viewProjMatrix,0);
 	}
 
+	public static void setProjMatrix(float[] matrix){
+		GLES20.glUniformMatrix4fv(mu_ProjMatrix, 1,false,matrix,0);
+	}
+
+	public static void setProjMatrix(float[] matrix,int position){
+		GLES20.glUniformMatrix4fv(position, 1,false,matrix,0);
+	}
+
 	/**
 	 * シェーダにモデル行列を設定
 	 */
 	//シェーダにモデル行列を設定
-	protected static void setShaderModelMatrix(float[] modelMatrix){
+	public static void setShaderModelMatrix(float[] modelMatrix){
 		GLES20.glUniformMatrix4fv(mu_modelMatrix, 1, false, modelMatrix, 0);
 	}
 
-	protected static void setShaderNormalMatrix(float[] normalMatrix){
+	public static void setShaderNormalMatrix(float[] normalMatrix){
 		GLES20.glUniformMatrix4fv(mu_NormalMatrix, 1, false, normalMatrix, 0);
+	}
+
+	public static void setShaderModelMatrix(float[] modelMatrix,int position){
+		GLES20.glUniformMatrix4fv(position, 1, false, modelMatrix, 0);
 	}
 
 	/**
@@ -627,8 +643,8 @@ public abstract class abstractGLES20Util {
 		}
 		else{
 			Matrix.setIdentityM(viewMatrix,0);
-			Matrix.translateM(viewMatrix,0,-width_gl/2f,-height_gl/2f,0);
-			Matrix.orthoM(u_ProjMatrix,0,-aspect,aspect,-1.0f,1.0f,mNear/100,mFar/100);
+			Matrix.translateM(viewMatrix, 0, -width_gl / 2f, -height_gl / 2f, 0);
+			Matrix.orthoM(u_ProjMatrix, 0, -aspect, aspect, -1.0f, 1.0f, mNear / 100, mFar / 100);
 			Matrix.multiplyMM(viewProjMatrix,0,u_ProjMatrix,0,viewMatrix,0);
 			//viewProjMatrix = u_ProjMatrix;
 		}
@@ -658,12 +674,12 @@ public abstract class abstractGLES20Util {
 
 	//視体積の四角錐型の設定
 	protected static void setPerspectiveM(float[] m, int offset, double fovy, double aspect, double zNear, double zFar) {
-		    Matrix.setIdentityM(m, offset);
-		    double ymax = zNear * Math.tan(fovy * Math.PI / 360.0);
-		    double ymin = -ymax;
-		    double xmin = ymin * aspect;
-		    double xmax = ymax * aspect;
-		    Matrix.frustumM(m, offset, (float)xmin, (float)xmax, (float)ymin, (float)ymax, (float)zNear, (float)zFar);
-		  }
+		Matrix.setIdentityM(m, offset);
+		double ymax = zNear * Math.tan(fovy * Math.PI / 360.0);
+		double ymin = -ymax;
+		double xmin = ymin * aspect;
+		double xmax = ymax * aspect;
+		Matrix.frustumM(m, offset, (float)xmin, (float)xmax, (float)ymin, (float)ymax, (float)zNear, (float)zFar);
+	  }
 
 }
