@@ -14,6 +14,7 @@ import java.nio.FloatBuffer;
 
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.Model.Face;
+import jp.ac.dendai.c.jtp.openglesutil.core.Shader.Shader;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.Image;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
@@ -30,6 +31,8 @@ public class GLES20Util extends abstractGLES20Util {
 		POSX,
 		POSY
 	}
+
+	private static Shader shader;
 	public GLES20Util(){
 		Log.d("GLES20Util","Constract");
 	}
@@ -176,27 +179,9 @@ public class GLES20Util extends abstractGLES20Util {
 	public static void DrawModel(float x,float y,float z,
 								 float scaleX,float scaleY, float scaleZ,
 								 float degreeX,float degreeY,float degreeZ,
-								 Face[] face,
+								 Face[] face,float alpha,
 								 int vertexBufferObject,int indexBufferObject,int indexCount){
-		Matrix.setIdentityM(modelMatrix, 0);
-		Matrix.setIdentityM(invertMatrix, 0);
-		Matrix.setIdentityM(normalMatrix, 0);
-
-		Matrix.translateM(modelMatrix, 0, x, y, z);
-		if(scaleX != 0 || scaleY != 0 || scaleZ != 0)
-			Matrix.scaleM(modelMatrix, 0, scaleX, scaleY, scaleZ);
-		if(degreeZ != 0)
-			Matrix.rotateM(modelMatrix, 0, degreeZ, 0, 0, 1);
-		if(degreeY != 0)
-			Matrix.rotateM(modelMatrix, 0, degreeY, 0, 1, 0);
-		if(degreeX != 0)
-			Matrix.rotateM(modelMatrix, 0, degreeX, 1, 0, 0);
-
-		Matrix.invertM(invertMatrix, 0, modelMatrix, 0);
-		Matrix.transposeM(normalMatrix, 0, invertMatrix, 0);
-
-		setShaderModelMatrix(modelMatrix);
-		setShaderNormalMatrix(normalMatrix);
+		shader.setMatrix(x,y,z,scaleX,scaleY,scaleZ,degreeX,degreeY,degreeZ);
 
 		GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vertexBufferObject);
 		GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
@@ -211,7 +196,7 @@ public class GLES20Util extends abstractGLES20Util {
 		GLES20.glEnableVertexAttribArray(ma_texCoord);  // バッファオブジェクトの割り当ての有効化
 
 		for(int n = 0;n < face.length;n++) {
-			face[n].matelial.setMatelial();
+			shader.setMaterial(face[n].material,alpha);
 			GLES20.glDrawElements(GLES20.GL_TRIANGLES, face[n].end-face[n].offset+1, GLES20.GL_UNSIGNED_INT, ISIZE*face[n].offset);
 		}
 		//GLES20.glDrawArrays(GLES20.GL_LINE_STRIP,0,8);

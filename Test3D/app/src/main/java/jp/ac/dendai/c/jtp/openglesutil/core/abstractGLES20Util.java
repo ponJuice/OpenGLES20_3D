@@ -230,9 +230,6 @@ public abstract class abstractGLES20Util {
 		//裏面を表示しない
 		GLES20.glEnable(GLES20.GL_CULL_FACE);
 		GLES20.glCullFace(GLES20.GL_BACK);
-
-		//デフォルトテクスチャ作成
-		white = createBitmap(255,255,255,255);
 	}
 
 	/**

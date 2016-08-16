@@ -13,7 +13,6 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
  */
 public abstract class Shader {
     protected static float[] modelMatrix = new float[16];
-    protected static float[] normalMatrix = new float[16];
     protected int program;
     protected int ma_Position;			//頂点シェーダの頂点座標の格納場所
     protected int mu_ProjMatrix;				//頂点シェーダのワールド行列用格納変数の場所
@@ -38,8 +37,12 @@ public abstract class Shader {
             throw new RuntimeException("u_ModelMatrixの格納場所の取得に失敗");
         }
     }
-    public abstract void setMaterial(Matelial material);
-    public abstract void draw(float x,float y,float z,float sx,float sy,float sz,float degx,float degy,float degz,int verBuffObj,int indBuffObj,int size);
+    //ポイントライトの設定
+    public abstract void setPointLight(float[] position,float[] color,float power);
+    //平行光線の設定
+    public abstract void setParallelLight(float[] direction,float[] color);
+    public abstract void setMaterial(Matelial material,float alpha);
+    public abstract void setMatrix(float x,float y,float z,float sx,float sy,float sz,float rx,float ry,float rz);
     public static int createProgram(String vertexShaderCode,String fragmentShaderCode){
         int program;
         Log.d("abstractGLES20Util", "initShader");

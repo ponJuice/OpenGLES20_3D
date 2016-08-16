@@ -1,0 +1,12 @@
+//UTF-8N 改行コードCR+LFで保存すること
+#ifdef GL_ES
+precision mediump float;
+#endif
+uniform sampler2D u_Sampler;	//図形に貼るテクスチャ
+uniform u_TexCoord;         //UV座標
+uniform float u_alpha;		//アルファ―値
+void main() {
+  vec4 texColor = texture2D(u_Sampler,v_TexCoord);
+  gl_FragColor = texColor.a*u_alpha;
+  //gl_FragColor = vec4(0.0, 1.0, 0.0, 0.5);
+}
