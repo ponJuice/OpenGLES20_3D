@@ -33,7 +33,4 @@ public class Matelial {
         tex_emmision = null;
         tex_specular = null;
     }
-    public void setMaterial(){
-        shader.setMaterial(this);
-    }
 }

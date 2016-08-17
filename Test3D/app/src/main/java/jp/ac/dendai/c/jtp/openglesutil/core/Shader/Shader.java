@@ -1,20 +1,23 @@
 package jp.ac.dendai.c.jtp.openglesutil.core.Shader;
 
-import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.util.Log;
 
 import jp.ac.dendai.c.jtp.Graphics.Model.Matelial;
-import jp.ac.dendai.c.jtp.Graphics.Model.Model;
-import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
+import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
+import jp.ac.dendai.c.jtp.openglesutil.Environment;
+import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
 /**
  * Created by Goto on 2016/07/30.
  */
-public abstract class Shader {
+public abstract class Shader{
     protected static float[] modelMatrix = new float[16];
+    protected Renderer first;
+    protected Renderer end;
+    protected int size;
     protected int program;
-    protected int ma_Position;			//頂点シェーダの頂点座標の格納場所
+    protected int ma_Position;			           //頂点シェーダの頂点座標の格納場所
     protected int mu_ProjMatrix;				//頂点シェーダのワールド行列用格納変数の場所
     protected int mu_modelMatrix;				//モデル行列格納場所
     protected int[] textureObject;
@@ -37,12 +40,64 @@ public abstract class Shader {
             throw new RuntimeException("u_ModelMatrixの格納場所の取得に失敗");
         }
     }
-    //ポイントライトの設定
-    public abstract void setPointLight(float[] position,float[] color,float power);
-    //平行光線の設定
-    public abstract void setParallelLight(float[] direction,float[] color);
+    public void addLast(Renderer r){
+        if(size == 0){
+            first = r;
+            end = r;
+            r.next = null;
+            r.prev = null;
+        }else{
+            r.prev = end;
+            end.next = r;
+            end = r;
+        }
+        r.shader = this;
+        size++;
+    }
+    public void remove(Renderer r){
+        r.remove(this);
+        size--;
+    }
+    public abstract void setEnvironmentParam(Environment e);
+    public abstract void setRenderParam(Renderer r);
     public abstract void setMaterial(Matelial material,float alpha);
     public abstract void setMatrix(float x,float y,float z,float sx,float sy,float sz,float rx,float ry,float rz);
+    public void draw(){
+        useShader();
+        Renderer r = first;
+        setEnvironmentParam(r.environment);
+        while(r != null){
+            setMatrix(r.gameObject.position.getX(),r.gameObject.position.getY(),r.gameObject.position.getZ(),
+                    r.gameObject.scale.getX(),r.gameObject.scale.getY(),r.gameObject.scale.getZ(),
+                    r.gameObject.rotation.getX(),r.gameObject.rotation.getY(),r.gameObject.rotation.getZ());
+            setRenderParam(r);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, r.mesh.getVBO());
+            GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, r.mesh.getIBO());
+            GLES20.glVertexAttribPointer(ma_Position, 3, GLES20.GL_FLOAT, false, GLES20Util.FSIZE * 8, 0);
+            GLES20.glEnableVertexAttribArray(ma_Position);  // バッファオブジェクトの割り当ての有効化
+
+            GLES20.glVertexAttribPointer(va_Normal, 3, GLES20.GL_FLOAT, true, GLES20Util.FSIZE * 8, GLES20Util.FSIZE * 3);
+            GLES20.glEnableVertexAttribArray(va_Normal);
+
+            //テクスチャの有効化
+            GLES20.glVertexAttribPointer(ma_texCoord, 2, GLES20.GL_FLOAT, false, FSIZE * 8, FSIZE * 6);
+            GLES20.glEnableVertexAttribArray(ma_texCoord);  // バッファオブジェクトの割り当ての有効化
+
+            for(int n = 0;n < face.length;n++) {
+                shader.setMaterial(face[n].material,alpha);
+                GLES20.glDrawElements(GLES20.GL_TRIANGLES, face[n].end-face[n].offset+1, GLES20.GL_UNSIGNED_INT, ISIZE*face[n].offset);
+            }
+            //GLES20.glDrawArrays(GLES20.GL_LINE_STRIP,0,8);
+            GLES20.glDisableVertexAttribArray(ma_Position);
+            GLES20.glDisableVertexAttribArray(va_Normal);
+            GLES20.glDisableVertexAttribArray(ma_texCoord);
+
+            r = r.next;
+        }
+    }
+    public void useShader(){
+        GLES20.glUseProgram(program);
+    }
     public static int createProgram(String vertexShaderCode,String fragmentShaderCode){
         int program;
         Log.d("abstractGLES20Util", "initShader");

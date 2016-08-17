@@ -56,6 +56,6 @@ public class ModelObject {
 
     public void draw(float x,float y,float z,float scaleX,float scaleY,float scaleZ,float degreeX,float degreeY,float degreeZ){
         //GLES20Util.setEmmision(matelial.emmision);
-        GLES20Util.DrawModel(x, y, z, scaleX, scaleY, scaleZ, degreeX, degreeY, degreeZ, faces, vertexBufferObject,indexBufferObject, v_indices.limit());
+        GLES20Util.DrawModel(x, y, z, scaleX, scaleY, scaleZ, degreeX, degreeY, degreeZ, faces, 1.0f,vertexBufferObject,indexBufferObject, v_indices.limit());
     }
 }
