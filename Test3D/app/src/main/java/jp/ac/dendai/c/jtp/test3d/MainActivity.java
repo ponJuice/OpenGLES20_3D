@@ -15,12 +15,15 @@ import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.ImageReader;
 import jp.ac.dendai.c.jtp.Graphics.Line.Line;
 import jp.ac.dendai.c.jtp.Graphics.Model.Model;
+import jp.ac.dendai.c.jtp.Graphics.Shader.DiffuseShader;
+import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
 import jp.ac.dendai.c.jtp.TouchUtil.Input;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 import jp.ac.dendai.c.jtp.TouchUtil.TouchListener;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FpsController;
+import jp.ac.dendai.c.jtp.openglesutil.Util.Math.Vector3;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
 public class MainActivity extends Activity implements GLSurfaceView.Renderer{
@@ -30,6 +33,11 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     private Model mode;
     private Line line_x,line_y,line_z;
     private Camera camera;
+    private Shader shader;
+    private Model[] models;
+    private Vector3 pos;
+    private Vector3 rot;
+    private Vector3 scl;
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
@@ -138,11 +146,17 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         String fragmentShader = new String(FileManager.readShaderFile(this,"FSHADER.txt"));
         GLES20Util.initGLES20Util(vertexShader,fragmentShader);
 
-        mode = Model.createModel(WavefrontObjConverter.createModel("untitled.obj"));
+        models = WavefrontObjConverter.createModel("untitled.obj");
         line_x = new Line(1f,0,0);
         line_y = new Line(0,1f,0);
         line_z = new Line(0,0,1f);
         camera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,-10f,10f,10f);
+        shader = new DiffuseShader();
+        shader.loadShader();
+        shader.useShader();
+        pos = new Vector3();
+        rot = new Vector3();
+        scl = new Vector3(1,1,1);
 
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f); // 画面をクリアする色を設定する
     }
@@ -162,7 +176,8 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         line_x.draw(0,0,0,50f,0,0);
         line_y.draw(0, 0, 0, 0, 50f, 0);
         line_z.draw(0,0,0,0,0,50f);
-        mode.draw(0, 0, 0, 1f, 1f, 1f, rotateX, rotateY, 0);
+        shader.draw(models[0],pos,rot,scl);
+        //mode.draw(0, 0, 0, 1f, 1f, 1f, rotateX, rotateY, 0);
 
         /*
         //文字の描画

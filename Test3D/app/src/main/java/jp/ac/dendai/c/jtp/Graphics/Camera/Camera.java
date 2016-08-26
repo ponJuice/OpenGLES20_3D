@@ -132,7 +132,6 @@ public class Camera {
         double xmax = ymax * aspect;
         Matrix.frustumM(m, offset, (float)xmin, (float)xmax, (float)ymin, (float)ymax, (float)zNear, (float)zFar);
     }
-
     private float[] uiCameraMatrix = new float[16];
     private float[] transformMatrix = new float[16];
     public void testUICamera(){

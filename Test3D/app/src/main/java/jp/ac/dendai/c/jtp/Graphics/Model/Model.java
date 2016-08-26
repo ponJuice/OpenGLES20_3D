@@ -7,32 +7,16 @@ import java.nio.IntBuffer;
 
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
-public class Model {
+public class Model extends Mesh{
 	private enum Buffer_Mode{
 		INDEX ,
 		VERTEX
 	}
-	private ModelObject[] models;
-	private int[] vertexBufferObject;
-	private int[] indexBufferObject;
 
-	public Model(ModelObject[] model) {
-		models = model;
-	}
-
-	private void setBufferObject(){
-		vertexBufferObject = GLES20Util.createBufferObject(models.length);
-		indexBufferObject = GLES20Util.createBufferObject(models.length);
-		for(int n = 0;n < models.length;n++){
-			models[n].setVertexBufferObject(vertexBufferObject[n]);
-			models[n].setIndexBufferObject(indexBufferObject[n]);
-		}
-	}
-
-	public void draw(float x, float y, float z, float scaleX, float scaleY, float scaleZ, float degreeX, float degreeY, float degreeZ) {
-		for (int n = 0; n < models.length; n++) {
-			models[n].draw(x, y, z, scaleX, scaleY, scaleZ, degreeX, degreeY, degreeZ);
-		}
+	public Model(Float[] vertex,Integer[] v_indices,Face[] faces){
+		this.vertex = Model.makeFloatBuffer(vertex);
+		this.index = Model.makeIntBuffer(v_indices);
+		this.faces = faces;
 	}
 
 	public static FloatBuffer makeFloatBuffer(float[] array) {
@@ -80,11 +64,5 @@ public class Model {
 		}
 		intBuffer.position(0);
 		return intBuffer;
-	}
-
-	public static Model createModel(ModelObject[] objects){
-		Model model = new Model(objects);
-		model.setBufferObject();
-		return model;
 	}
 }

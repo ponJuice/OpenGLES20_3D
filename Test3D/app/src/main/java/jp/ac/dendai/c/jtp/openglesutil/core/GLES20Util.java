@@ -13,8 +13,6 @@ import android.util.Log;
 import java.nio.FloatBuffer;
 
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
-import jp.ac.dendai.c.jtp.Graphics.Model.Face;
-import jp.ac.dendai.c.jtp.openglesutil.core.Shader.Shader;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.Image;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
@@ -31,8 +29,6 @@ public class GLES20Util extends abstractGLES20Util {
 		POSX,
 		POSY
 	}
-
-	private static Shader shader;
 	public GLES20Util(){
 		Log.d("GLES20Util","Constract");
 	}
@@ -176,7 +172,7 @@ public class GLES20Util extends abstractGLES20Util {
 		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,4);	//描画
 	}
 
-	public static void DrawModel(float x,float y,float z,
+	/*public static void DrawModel(float x,float y,float z,
 								 float scaleX,float scaleY, float scaleZ,
 								 float degreeX,float degreeY,float degreeZ,
 								 Face[] face,float alpha,
@@ -204,7 +200,7 @@ public class GLES20Util extends abstractGLES20Util {
 		GLES20.glDisableVertexAttribArray(va_Normal);
 		GLES20.glDisableVertexAttribArray(ma_texCoord);
 
-	}
+	}*/
 
 	public static void DrawGraph(float startX,float startY,float lengthX,float lengthY,Image img){
 		float scaleX = lengthX;
