@@ -29,12 +29,12 @@ public abstract class Shader {
     };
     protected static float[] modelMatrix = new float[16];
     protected static int useProgram;
-    protected int program;
-    protected int ma_Position;			        //頂点シェーダの頂点座標の格納場所
-    protected int mu_ProjMatrix;				//頂点シェーダのワールド行列用格納変数の場所
-    protected int mu_modelMatrix;               //モデルマトリックスの格納場所
-    protected int u_Sampler;
-    protected int ma_texCoord;
+    protected int program = -1;
+    protected int ma_Position = -1;			        //頂点シェーダの頂点座標の格納場所
+    protected int mu_ProjMatrix = -1;				//頂点シェーダのワールド行列用格納変数の場所
+    protected int mu_modelMatrix = -1;               //モデルマトリックスの格納場所
+    protected int u_Sampler = -1;
+    protected int ma_texCoord = -1;
     protected int[] texture;
     protected String vs_name,fs_name;
     public Shader(String vertex,String fragment){
@@ -53,7 +53,7 @@ public abstract class Shader {
         mu_ProjMatrix = Shader.getUniformLocation(program, "u_ProjMatrix");
 
         // 頂点の格納場所を取得
-        ma_Position = Shader.getUniformLocation(program, "a_Position");
+        ma_Position = Shader.getAttributeLocation(program, "a_Position");
 
         // モデル行列の格納場所を取得
         mu_modelMatrix = Shader.getUniformLocation(program, "u_ModelMatrix");
@@ -62,7 +62,7 @@ public abstract class Shader {
         u_Sampler = Shader.getUniformLocation(program,"u_Sampler");
 
         //テクスチャ座標の格納場所を取得
-        ma_texCoord = Shader.getAttributeLocation(program,"v_TexCoord");
+        ma_texCoord = Shader.getAttributeLocation(program,"a_TexCoord");
 
         // バッファオブジェクトを作成する
         int[] vertexTexCoord = new int[1];
@@ -70,7 +70,7 @@ public abstract class Shader {
         //テクスチャ座標のバッファを作成
         Buffer texBuffer = BufferCreater.createFloatBuffer(texPosition);
 
-        // 頂点の座標とテクスチャ座標をバッファオブジェクトに書き込む
+        // テクスチャ座標をバッファオブジェクトに書き込む
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vertexTexCoord[0]);
         GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, GLES20Util.FSIZE * texBuffer.limit(), texBuffer, GLES20.GL_DYNAMIC_DRAW);
 
@@ -78,7 +78,9 @@ public abstract class Shader {
         GLES20.glEnableVertexAttribArray(ma_texCoord);  // バッファオブジェクトの割り当ての有効化
 
         //テクスチャユニットは一つだけ使用
-        texture = new int[1];
+        // テクスチャオブジェクトを作成する
+        int[] texture = new int[1];
+        GLES20.glGenTextures(1, texture, 0);
         //テクスチャユニットに関する設定
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);   // テクスチャユニット0を有効にする
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture[0]); // テクスチャオブジェクトをバインドする

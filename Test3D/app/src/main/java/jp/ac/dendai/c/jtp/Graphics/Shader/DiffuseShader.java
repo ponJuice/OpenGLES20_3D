@@ -13,7 +13,7 @@ import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
  */
 public class DiffuseShader extends Shader{
     public DiffuseShader(){
-        super("diff_vertex","diff_fragment");
+        super("DiffuseShaderVertex","DiffuseShaderFragment");
     }
     @Override
     void loadShaderVariable() {

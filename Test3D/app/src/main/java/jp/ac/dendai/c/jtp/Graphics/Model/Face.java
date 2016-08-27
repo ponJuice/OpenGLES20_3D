@@ -1,8 +1,5 @@
 package jp.ac.dendai.c.jtp.Graphics.Model;
 
-import jp.ac.dendai.c.jtp.openglesutil.core.Shader.Shader;
-import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
-
 /**
  * Created by Goto on 2016/07/26.
  */

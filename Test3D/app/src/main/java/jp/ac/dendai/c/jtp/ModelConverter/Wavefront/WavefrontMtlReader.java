@@ -45,7 +45,7 @@ public class WavefrontMtlReader {
                 //ディゾルブ
                 matelials.get(targetMatelial).d = Float.valueOf(content[1]);
             }else if(content[0].equals("map_Kd")){
-                matelials.get(targetMatelial).texture = ImageReader.readImageToAssets(content[1]);
+                matelials.get(targetMatelial).tex_diffuse = ImageReader.readImageToAssets(content[1]);
             }
         }
         return matelials;

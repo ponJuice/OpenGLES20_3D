@@ -213,13 +213,13 @@ public abstract class abstractGLES20Util {
 	 */
 	public static void initGLES20Util(String vertexShaderString,String fragmentShaderString){
 		//シェーダの準備
-		initShader(vertexShaderString, fragmentShaderString);
+		//initShader(vertexShaderString, fragmentShaderString);
 		Log.d("abstractGLES20Util", "finished init shader");
 		//バッファの準備
-		initBuffer();
+		//initBuffer();
 		Log.d("abstractGLES20Util","finished initBuffer");
 		//頂点バッファオブジェクトの作成
-		createAndSetOnBufferObject();
+		//createAndSetOnBufferObject();
 		Log.d("abstractGLES20Util", "finished createAndSetOnBufferObject");
 		//アルファブレンディングの有効化
 		GLES20.glEnable(GLES20.GL_BLEND);

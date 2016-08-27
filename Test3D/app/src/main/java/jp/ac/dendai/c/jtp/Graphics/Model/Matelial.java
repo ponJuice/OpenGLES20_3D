@@ -2,9 +2,6 @@ package jp.ac.dendai.c.jtp.Graphics.Model;
 
 import android.graphics.Bitmap;
 
-import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
-import jp.ac.dendai.c.jtp.openglesutil.core.Shader.Shader;
-
 /**
  * Created by Goto on 2016/07/21.
  */
@@ -21,7 +18,6 @@ public class Matelial {
     public Bitmap tex_diffuse;
     public Bitmap tex_specular;
     public Bitmap tex_ambient;
-    public Shader shader;
     public float Ns,d;
     public Matelial(){
         emmision = new float[3];

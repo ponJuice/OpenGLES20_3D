@@ -17,6 +17,11 @@ public class Model extends Mesh{
 		this.vertex = Model.makeFloatBuffer(vertex);
 		this.index = Model.makeIntBuffer(v_indices);
 		this.faces = faces;
+		int[] bufferObjects = createBufferObject(2);
+		vertexBufferObject = bufferObjects[0];
+		indexBufferObject = bufferObjects[1];
+		setVertexBufferObject();
+		setIndexBufferObject();
 	}
 
 	public static FloatBuffer makeFloatBuffer(float[] array) {

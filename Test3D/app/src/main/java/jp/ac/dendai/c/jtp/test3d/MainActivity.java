@@ -135,8 +135,8 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         // 表示領域を設定する
         GLES20Util.initDrawErea(width, height, true);
         //テクスチャの再読み込み
-        GLES20Util.initTextures();
-        GLES20Util.initFpsBitmap(fpsImage, true, R.drawable.degital2);
+        //GLES20Util.initTextures();
+        //GLES20Util.initFpsBitmap(fpsImage, true, R.drawable.degital2);
         Log.d("onSurfaceCreated", "initShader");
     }
 
@@ -145,15 +145,12 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         String vertexShader = new String(FileManager.readShaderFile(this, "VSHADER.txt"));
         String fragmentShader = new String(FileManager.readShaderFile(this,"FSHADER.txt"));
         GLES20Util.initGLES20Util(vertexShader,fragmentShader);
-
-        models = WavefrontObjConverter.createModel("untitled.obj");
-        line_x = new Line(1f,0,0);
-        line_y = new Line(0,1f,0);
-        line_z = new Line(0,0,1f);
-        camera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,-10f,10f,10f);
         shader = new DiffuseShader();
         shader.loadShader();
         shader.useShader();
+        models = WavefrontObjConverter.createModel("houdai.obj");
+        camera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,-10f,10f,10f);
+        camera.setLookPosition(0,0,0);
         pos = new Vector3();
         rot = new Vector3();
         scl = new Vector3(1,1,1);
@@ -167,15 +164,16 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     private void draw(){
         // 描画領域をクリアする
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+        shader.useShader();
         camera.updateCamera();
         if(count % 60 == 0) {
             Log.d("FPS",String.valueOf(fpsController.getFps()));
         }
         count++;
         //Log.d("Touch",Input.getTouchArray()[0].toString());
-        line_x.draw(0,0,0,50f,0,0);
-        line_y.draw(0, 0, 0, 0, 50f, 0);
-        line_z.draw(0,0,0,0,0,50f);
+        //line_x.draw(0,0,0,50f,0,0);
+        //line_y.draw(0, 0, 0, 0, 50f, 0);
+        //line_z.draw(0,0,0,0,0,50f);
         shader.draw(models[0],pos,rot,scl);
         //mode.draw(0, 0, 0, 1f, 1f, 1f, rotateX, rotateY, 0);
 
