@@ -13,7 +13,7 @@ import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
  */
 public class DiffuseShader extends Shader{
     public DiffuseShader(){
-        super("DiffuseShaderVertex","DiffuseShaderFragment");
+        super("DiffuseShaderVertex.txt", "DiffuseShaderFragment.txt");
     }
     @Override
     void loadShaderVariable() {
@@ -56,8 +56,9 @@ public class DiffuseShader extends Shader{
 
         for(int n = 0;n < mesh.getFaces().length;n++) {
             setMaterial(mesh.getFaces()[n]);
-            GLES20.glDrawElements(GLES20.GL_TRIANGLES, mesh.getFaces()[n].end-mesh.getFaces()[n].offset+1, GLES20.GL_UNSIGNED_INT, GLES20Util.ISIZE*mesh.getFaces()[n].offset);
+            GLES20.glDrawElements(GLES20.GL_POINTS, mesh.getFaces()[n].end-mesh.getFaces()[n].offset+1, GLES20.GL_UNSIGNED_INT, GLES20Util.ISIZE*mesh.getFaces()[n].offset);
         }
+        //GLES20.glVertexAttribPointer(ma_Position,3,GLES20.GL_FLOAT,false,GLES20Util.FSIZE*3,texBuffer);
         //GLES20.glDrawArrays(GLES20.GL_LINE_STRIP,0,8);
         GLES20.glDisableVertexAttribArray(ma_Position);
         GLES20.glDisableVertexAttribArray(ma_texCoord);

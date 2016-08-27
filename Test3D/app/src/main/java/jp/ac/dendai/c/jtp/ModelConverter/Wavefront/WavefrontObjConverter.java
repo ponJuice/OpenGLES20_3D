@@ -7,9 +7,7 @@ import java.util.LinkedList;
 
 import jp.ac.dendai.c.jtp.Graphics.Model.Face;
 import jp.ac.dendai.c.jtp.Graphics.Model.Matelial;
-import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
 import jp.ac.dendai.c.jtp.Graphics.Model.Model;
-import jp.ac.dendai.c.jtp.Graphics.Model.ModelObject;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 
 public class WavefrontObjConverter {

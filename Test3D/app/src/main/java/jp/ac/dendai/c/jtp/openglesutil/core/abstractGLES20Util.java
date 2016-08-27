@@ -228,8 +228,8 @@ public abstract class abstractGLES20Util {
 		//隠面消去の有効化
 		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 		//裏面を表示しない
-		GLES20.glEnable(GLES20.GL_CULL_FACE);
-		GLES20.glCullFace(GLES20.GL_BACK);
+		//GLES20.glEnable(GLES20.GL_CULL_FACE);
+		//GLES20.glCullFace(GLES20.GL_BACK);
 	}
 
 	/**
@@ -618,7 +618,7 @@ public abstract class abstractGLES20Util {
 	   * 表示領域を設定
 	   */
 	//表示領域を設定
- 	public static void initDrawErea(int width,int height,boolean Perspective){
+ 	public static void initDrawErea(int width,int height){
 		Width = width;
 		Height = height;
 
@@ -632,27 +632,15 @@ public abstract class abstractGLES20Util {
 
 
 		GLES20.glViewport(0, 0, width, height);
-		float[] viewMatrix = new float[16];
-		if(Perspective){
-			setPerspectiveM(u_ProjMatrix,0,40.0,(double)width/height,1.0,100.0);
-		    Matrix.setLookAtM(viewMatrix, 0, -10f, 10f, 10f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-		    Matrix.multiplyMM(viewProjMatrix, 0, u_ProjMatrix, 0, viewMatrix, 0);
-		}
-		else{
-			Matrix.setIdentityM(viewMatrix,0);
-			Matrix.translateM(viewMatrix, 0, -width_gl / 2f, -height_gl / 2f, 0);
-			Matrix.orthoM(u_ProjMatrix, 0, -aspect, aspect, -1.0f, 1.0f, mNear / 100, mFar / 100);
-			Matrix.multiplyMM(viewProjMatrix,0,u_ProjMatrix,0,viewMatrix,0);
-			//viewProjMatrix = u_ProjMatrix;
-		}
+		//float[] viewMatrix = new float[16];
 
-		GLES20.glUniform3f(vu_LightColor, 1f, 1f, 1f);
-		float[] lightDirection = new float[] { 0,1.0f,0};
-		normalizeVector3(lightDirection);
-		GLES20.glUniform3fv(vu_LightDirection,1,lightDirection,0);
+		//GLES20.glUniform3f(vu_LightColor, 1f, 1f, 1f);
+		//float[] lightDirection = new float[] { 0,1.0f,0};
+		//normalizeVector3(lightDirection);
+		//GLES20.glUniform3fv(vu_LightDirection,1,lightDirection,0);
 
 		//シェーダにワールド行列を設定
-		setShaderProjMatrix();
+		//setShaderProjMatrix();
 
 		//デバッグ
 		Log.d("GLES20Util:Width",String.valueOf(aspect));

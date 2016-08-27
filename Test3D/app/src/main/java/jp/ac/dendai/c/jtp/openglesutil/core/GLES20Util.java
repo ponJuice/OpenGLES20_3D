@@ -101,29 +101,30 @@ public class GLES20Util extends abstractGLES20Util {
 	public static void setCamera(Camera camera){
 		if(camera.getCameraMode() == Camera.CAMERA_MODE.PERSPECTIVE){
 			if(camera.getPersUpdate())
-				setPerspectiveM(u_ProjMatrix,0,camera.getAngleOfView(),(double)Width/Height,camera.getNear(),camera.getmFar());
+				setPerspectiveM(camera.getViewProjMatrix(),0,camera.getAngleOfView(),(double)Width/Height,camera.getNear(),camera.getmFar());
 			if(camera.getPosUpdate())
-				Matrix.setLookAtM(camera.getMatrix(), 0, camera.getPosition(Camera.POSITION.X),
+				Matrix.setLookAtM(camera.getTransformMatrix(), 0, camera.getPosition(Camera.POSITION.X),
 														camera.getPosition(Camera.POSITION.Y),
 														camera.getPosition(Camera.POSITION.Z),
 														camera.getLookPosition(Camera.POSITION.X),
 														camera.getLookPosition(Camera.POSITION.Y),
 														camera.getLookPosition(Camera.POSITION.Z),
 														0.0f, 1.0f, 0.0f);
-			Matrix.multiplyMM(viewProjMatrix, 0, u_ProjMatrix, 0, camera.getMatrix(), 0);
+			Matrix.multiplyMM(camera.getCameraMatrix(), 0, camera.getViewProjMatrix(), 0, camera.getTransformMatrix(), 0);
 		}
 		else{
 			if(camera.getPosUpdate()) {
-				Matrix.setIdentityM(camera.getMatrix(), 0);
-				Matrix.translateM(camera.getMatrix(), 0, -width_gl / 2f, -height_gl / 2f, 0);
+				Matrix.setIdentityM(camera.getTransformMatrix(), 0);
+				Matrix.translateM(camera.getTransformMatrix(), 0, -width_gl / 2f, -height_gl / 2f, 0);
 			}
 			if(camera.getPersUpdate())
-				Matrix.orthoM(u_ProjMatrix,0,-aspect,aspect,-1.0f,1.0f,camera.getNear()/100,camera.getmFar()/100);
-			Matrix.multiplyMM(viewProjMatrix,0,u_ProjMatrix,0,camera.getMatrix(),0);
+				Matrix.orthoM(camera.getViewProjMatrix(),0,-aspect,aspect,-1.0f,1.0f,camera.getNear()/100f,camera.getmFar()/100f);
+			Matrix.multiplyMM(camera.getCameraMatrix(),0,camera.getViewProjMatrix(),0,camera.getTransformMatrix(),0);
 			//viewProjMatrix = u_ProjMatrix;
 		}
+
 		//シェーダにワールド行列を設定
-		setShaderProjMatrix();
+		setProjMatrix(camera.getCameraMatrix());
 	}
 
 	public static void DrawLine(FloatBuffer vertex,float x,float y,float z,float lengthX,float lengthY,float lengthZ,float[] color,float a,float width,GLES20COMPOSITIONMODE mode){

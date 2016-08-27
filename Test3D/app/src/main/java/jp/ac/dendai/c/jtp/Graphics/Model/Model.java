@@ -5,14 +5,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
-
 public class Model extends Mesh{
-	private enum Buffer_Mode{
-		INDEX ,
-		VERTEX
-	}
-
 	public Model(Float[] vertex,Integer[] v_indices,Face[] faces){
 		this.vertex = Model.makeFloatBuffer(vertex);
 		this.index = Model.makeIntBuffer(v_indices);

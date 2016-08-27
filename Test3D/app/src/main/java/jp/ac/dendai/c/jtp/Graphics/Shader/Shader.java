@@ -6,9 +6,11 @@ import android.opengl.GLUtils;
 import android.util.Log;
 
 import java.nio.Buffer;
+import java.nio.FloatBuffer;
 
 import jp.ac.dendai.c.jtp.Graphics.Model.Face;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
+import jp.ac.dendai.c.jtp.Graphics.Model.Model;
 import jp.ac.dendai.c.jtp.openglesutil.Util.BufferCreater;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 import jp.ac.dendai.c.jtp.openglesutil.Util.Math.Vector3;
@@ -21,14 +23,15 @@ public abstract class Shader {
     /**
      * テクスチャ座標
      */
-    private static final float[] texPosition={		//テクスチャ座標
-            0.0f,1.0f,
-            1.0f,1.0f,
-            0.0f,0.0f,
-            1.0f,0.0f
+    protected static final float[] texPosition={		//テクスチャ座標
+            0.0f,1.0f,0.0f,
+            1.0f,1.0f,0.0f,
+            0.0f,0.0f,0.0f,
+            1.0f,0.0f,0.0f
     };
     protected static float[] modelMatrix = new float[16];
     protected static int useProgram;
+    protected static FloatBuffer texBuffer;
     protected int program = -1;
     protected int ma_Position = -1;			        //頂点シェーダの頂点座標の格納場所
     protected int mu_ProjMatrix = -1;				//頂点シェーダのワールド行列用格納変数の場所
@@ -37,9 +40,11 @@ public abstract class Shader {
     protected int ma_texCoord = -1;
     protected int[] texture;
     protected String vs_name,fs_name;
+
     public Shader(String vertex,String fragment){
         vs_name = vertex;
         fs_name = fragment;
+        //texBuffer = Model.makeFloatBuffer(texPosition);
     }
     public void loadShader(){
         //シェーダ―ファイルの中身を読み込む
@@ -63,19 +68,6 @@ public abstract class Shader {
 
         //テクスチャ座標の格納場所を取得
         ma_texCoord = Shader.getAttributeLocation(program,"a_TexCoord");
-
-        // バッファオブジェクトを作成する
-        int[] vertexTexCoord = new int[1];
-        GLES20.glGenBuffers(1, vertexTexCoord, 0);
-        //テクスチャ座標のバッファを作成
-        Buffer texBuffer = BufferCreater.createFloatBuffer(texPosition);
-
-        // テクスチャ座標をバッファオブジェクトに書き込む
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vertexTexCoord[0]);
-        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, GLES20Util.FSIZE * texBuffer.limit(), texBuffer, GLES20.GL_DYNAMIC_DRAW);
-
-        GLES20.glVertexAttribPointer(ma_texCoord, 2, GLES20.GL_FLOAT, false, 0, 0);
-        GLES20.glEnableVertexAttribArray(ma_texCoord);  // バッファオブジェクトの割り当ての有効化
 
         //テクスチャユニットは一つだけ使用
         // テクスチャオブジェクトを作成する
@@ -121,7 +113,7 @@ public abstract class Shader {
         return variable;
     }
     protected static int getAttributeLocation(int program,String name){
-        int variable = GLES20.glGetAttribLocation(program,name);
+        int variable = GLES20.glGetAttribLocation(program, name);
         if(variable == -1){
             throw new RuntimeException(name+"の格納場所の取得に失敗");
         }

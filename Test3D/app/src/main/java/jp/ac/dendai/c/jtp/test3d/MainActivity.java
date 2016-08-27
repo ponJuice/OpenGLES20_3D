@@ -133,7 +133,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     public void onSurfaceChanged(GL10 arg0, int width, int height) {
         Log.d("MainActivity", "onSurfaceChanged");
         // 表示領域を設定する
-        GLES20Util.initDrawErea(width, height, true);
+        GLES20Util.initDrawErea(width, height);
         //テクスチャの再読み込み
         //GLES20Util.initTextures();
         //GLES20Util.initFpsBitmap(fpsImage, true, R.drawable.degital2);
@@ -148,14 +148,13 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         shader = new DiffuseShader();
         shader.loadShader();
         shader.useShader();
-        models = WavefrontObjConverter.createModel("houdai.obj");
-        camera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,-10f,10f,10f);
-        camera.setLookPosition(0,0,0);
+        models = WavefrontObjConverter.createModel("untitled.obj");
+        camera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,0f,0f,-10f);
         pos = new Vector3();
         rot = new Vector3();
         scl = new Vector3(1,1,1);
 
-        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f); // 画面をクリアする色を設定する
+        GLES20.glClearColor(0f, 0.0f, 0.0f, 1.0f); // 画面をクリアする色を設定する
     }
     private void process(){
         fpsController.updateFps();

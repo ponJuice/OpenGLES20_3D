@@ -6,7 +6,6 @@ uniform sampler2D u_Sampler;	//図形に貼るテクスチャ
 varying vec2 v_TexCoord;	//頂点シェーダからテクスチャ座標を受け取る
 void main() {
   vec4 texColor = texture2D(u_Sampler,v_TexCoord);
-  vec4 temp = vec4(1,1,1,1);
-  gl_FragColor = texColor + temp;
-  //gl_FragColor = vec4(0.0, 1.0, 0.0, 0.5);
+  gl_FragColor = texColor;
+  //gl_FragColor = vec4(0.0, 1.0, 0.0, 1);
 }

@@ -18,6 +18,8 @@ public class Mesh {
     protected Face[] faces;
     public int getVBO(){return vertexBufferObject;}
     public int getIBO(){return indexBufferObject;}
+    public FloatBuffer getVertexBuffer(){return vertex;}
+    public IntBuffer getIndexBuffer(){return index;}
     protected void setVertexBufferObject(){
         GLES20Util.setVertexBuffer(vertexBufferObject, vertex, GLES20.GL_STATIC_DRAW);
     }

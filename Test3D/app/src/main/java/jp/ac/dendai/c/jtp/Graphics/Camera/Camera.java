@@ -18,15 +18,18 @@ public class Camera {
         Y,
         Z
     }
-    private float[] cameraMatrix = new float[16];
+    private float[] cameraMatrix = new float[16];               //最終的なマトリックス
+    private float[] viewProjMatrix = new float[16];             //射影マトリックス
+    private float[] uiCameraMatrix = new float[16];
+    private float[] transformMatrix = new float[16];            //移動回転拡縮マトリックス
     private CAMERA_MODE camera_mode;
-    private float x = -10f,y = 10f,z = 10f;
+    private float x = 0f,y = 0f,z = -10f;
     private float lx = 0,ly = 0,lz = 0;
     private float angleOfView = 40;
     private boolean update = false;
     private boolean posUpdate = false;
     private boolean persUpdate = false;
-    private float mNear=1f,mFar=100f;
+    private float mNear=0.1f,mFar=100f;
     public Camera(CAMERA_MODE mode,float x,float y,float z){
         update = true;
         posUpdate = true;
@@ -36,9 +39,11 @@ public class Camera {
         this.y = y;
         this.z = z;
     }
-    public float[] getMatrix(){
+    public float[] getCameraMatrix(){
         return cameraMatrix;
     }
+    public float[] getViewProjMatrix(){return viewProjMatrix;}
+    public float[] getTransformMatrix(){return transformMatrix;}
     public CAMERA_MODE getCameraMode(){
         return camera_mode;
     }
@@ -132,8 +137,6 @@ public class Camera {
         double xmax = ymax * aspect;
         Matrix.frustumM(m, offset, (float)xmin, (float)xmax, (float)ymin, (float)ymax, (float)zNear, (float)zFar);
     }
-    private float[] uiCameraMatrix = new float[16];
-    private float[] transformMatrix = new float[16];
     public void testUICamera(){
         Matrix.setIdentityM(transformMatrix,0);
         Matrix.translateM(transformMatrix, 0, -GLES20Util.getWidth_gl() / 2f, -GLES20Util.getHeight_gl() / 2f, 0);
