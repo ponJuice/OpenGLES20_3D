@@ -1,91 +1,101 @@
 package jp.ac.dendai.c.jtp.Graphics.Shader;
 
-import android.graphics.Bitmap;
 import android.opengl.GLES20;
-import android.opengl.GLUtils;
+import android.opengl.Matrix;
 import android.util.Log;
 
-import java.nio.Buffer;
-import java.nio.FloatBuffer;
-
+import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.Model.Face;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
 import jp.ac.dendai.c.jtp.Graphics.Model.Model;
-import jp.ac.dendai.c.jtp.openglesutil.Util.BufferCreater;
-import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
-import jp.ac.dendai.c.jtp.openglesutil.Util.Math.Vector3;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
 /**
- * Created by テツヤ on 2016/08/26.
+ * Created by テツヤ on 2016/08/29.
  */
 public abstract class Shader {
+    protected float[] modelMatrix = new float[16];
+    protected float[] invertMatrix = new float[16];
+    protected float[] normalMatrix = new float[16];
+    protected static int useProgram = -1;
     /**
-     * テクスチャ座標
+     * プログラムオブジェクト
      */
-    protected static final float[] texPosition={		//テクスチャ座標
-            0.0f,1.0f,0.0f,
-            1.0f,1.0f,0.0f,
-            0.0f,0.0f,0.0f,
-            1.0f,0.0f,0.0f
-    };
-    protected static float[] modelMatrix = new float[16];
-    protected static int useProgram;
-    protected static FloatBuffer texBuffer;
-    protected int program = -1;
-    protected int ma_Position = -1;			        //頂点シェーダの頂点座標の格納場所
-    protected int mu_ProjMatrix = -1;				//頂点シェーダのワールド行列用格納変数の場所
-    protected int mu_modelMatrix = -1;               //モデルマトリックスの格納場所
-    protected int u_Sampler = -1;
-    protected int ma_texCoord = -1;
-    protected int[] texture;
-    protected String vs_name,fs_name;
+    protected int program;						//プログラムオブジェクト
+    /**
+     * 頂点シェーダの頂点座標の格納場所
+     */
+    protected int ma_Position;			//頂点シェーダの頂点座標の格納場所
+    /**
+     * 頂点シェーダのワールド行列用格納変数の場所
+     */
+    protected int mu_ProjMatrix;				//頂点シェーダのワールド行列用格納変数の場所
+    /**
+     * テクスチャオブジェクトの格納場所
+     */
+    protected int ma_texCoord;				//テクスチャオブジェクトの格納場所
+    /**
+     * モデル行列格納場所
+     */
+    protected int mu_modelMatrix;				//モデル行列格納場所
+    protected int u_Sampler;
+    protected Camera camera;
+    public Shader(){}
+    public Shader(String v,String f){
+        Log.d("abstractGLES20Util","initShader");
 
-    public Shader(String vertex,String fragment){
-        vs_name = vertex;
-        fs_name = fragment;
-        //texBuffer = Model.makeFloatBuffer(texPosition);
-    }
-    public void loadShader(){
-        //シェーダ―ファイルの中身を読み込む
-        String vertex = FileManager.readTextFile(vs_name);
-        String fragment = FileManager.readTextFile(fs_name);
-        //プログラムオブジェクトを作成
-        program = initShader(vertex,fragment);
-
-        //シェーダ変数の格納場所を取得
-        //プロジェクション行列の取得
-        mu_ProjMatrix = Shader.getUniformLocation(program, "u_ProjMatrix");
-
-        // 頂点の格納場所を取得
-        ma_Position = Shader.getAttributeLocation(program, "a_Position");
-
-        // モデル行列の格納場所を取得
-        mu_modelMatrix = Shader.getUniformLocation(program, "u_ModelMatrix");
-
-        //テクスチャサンプラの格納場所を取得
-        u_Sampler = Shader.getUniformLocation(program,"u_Sampler");
-
-        //テクスチャ座標の格納場所を取得
-        ma_texCoord = Shader.getAttributeLocation(program,"a_TexCoord");
-
-        //テクスチャユニットは一つだけ使用
-        // テクスチャオブジェクトを作成する
-        int[] texture = new int[1];
-        GLES20.glGenTextures(1, texture, 0);
-        //テクスチャユニットに関する設定
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);   // テクスチャユニット0を有効にする
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture[0]); // テクスチャオブジェクトをバインドする
-        // テクスチャパラメータを設定する
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-
-        //シェーダ変数の取得
-        loadShaderVariable();
+        program = createShaderProgram(initVertexShader(v),initFragmentShader(f));
 
         //プログラムの使用開始
-        GLES20.glUseProgram(program);
-        Log.d("abstractGLES20Util", "use stert Program finished");
+        //GLES20.glUseProgram(program);
+        Log.d("abstractGLES20Util","use stert Program finished");
+
+        Log.d("abstractGLES20Util","end of initShader");
+        // u_ProjMatrix変数の格納場所を取得する
+        mu_ProjMatrix = GLES20Util.getUniformLocation(program, "u_ProjMatrix");
+        // a_Positionの格納場所を取得
+        ma_Position = GLES20Util.getAttributeLocation(program, "a_Position");
+        // モデル行列の格納場所を取得
+        mu_modelMatrix = GLES20Util.getUniformLocation(program, "u_ModelMatrix");
+        //テクスチャの格納場所を取得
+        ma_texCoord = GLES20Util.getAttributeLocation(program, "a_TexCoord");
+        loadShaderVariable();
     }
+
+    /**
+     * テクスチャの使用を可能にします
+     * @param num テクスチャオブジェクトの数
+     */
+    public static void useTexture(int num){
+        // テクスチャオブジェクトを作成する
+        int[] textures = new int[num];
+        GLES20.glGenTextures(num, textures, 0);
+        if(num >= 1) {
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);   // テクスチャユニット0を有効にする
+
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]); // テクスチャオブジェクトをバインドする
+
+            // テクスチャパラメータを設定する
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        }
+        if(num >= 2){
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE1);   // テクスチャユニット0を有効にする
+
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[1]); // テクスチャオブジェクトをバインドする
+
+            // テクスチャパラメータを設定する
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        }
+        if(num >= 3){
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE2);   // テクスチャユニット0を有効にする
+
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[2]); // テクスチャオブジェクトをバインドする
+
+            // テクスチャパラメータを設定する
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        }
+    }
+
     public void useShader(){
         if(useProgram == program)
             return;
@@ -95,7 +105,6 @@ public abstract class Shader {
         GLES20.glUseProgram(program);
         useProgram = program;
     }
-    public abstract void draw(Mesh mesh, Vector3 pos, Vector3 rotate, Vector3 scale);
 
     //シェーダ―変数の取得
     abstract void loadShaderVariable();
@@ -103,45 +112,28 @@ public abstract class Shader {
     //マテリアルの設定
     abstract void setMaterial(Face face);
 
-    //シェーダ―変数の取得用ユーティリティ関数
-    //エラーの処理もする
-    protected static int getUniformLocation(int program,String name){
-        int variable = GLES20.glGetUniformLocation(program, name);
-        if (variable == -1) {
-            throw new RuntimeException(name+"の格納場所の取得に失敗");
-        }
-        return variable;
+    public void setCamera(Camera camera){
+        this.camera = camera;
     }
-    protected static int getAttributeLocation(int program,String name){
-        int variable = GLES20.glGetAttribLocation(program, name);
-        if(variable == -1){
-            throw new RuntimeException(name+"の格納場所の取得に失敗");
-        }
-        return variable;
+    public void updateCamera(){
+        camera.updateCamera(this);
     }
-
+    public int getProjMatrixPosition(){
+        return mu_ProjMatrix;
+    }
     /**
-     * シェーダ―を初期化します
+     * シェーダをリンクし、プログラムオブジェクトを作成
      */
-    private static int initShader(String vertexShaderString,String fragmentShaderString){
-        Log.d("abstractGLES20Util","initShader");
-        //頂点シェーダの初期化
-        int vertexShader = initVertexShader(vertexShaderString);
-        Log.d("abstractGLES20Util","initVertexShader finished");
-
-        //フラグメントシェーダの初期化
-        int fragmentShader = initFragmentShader(fragmentShaderString);
-        Log.d("abstractGLES20Util","initFragmentShader finished");
-
+    private static int createShaderProgram(int vertexShaderObject,int fragmentShaderObject){
         //二つのシェーダオブジェクトを設定
         int program = GLES20.glCreateProgram();
-        GLES20.glAttachShader(program, vertexShader);
-        GLES20.glAttachShader(program, fragmentShader);
+        GLES20.glAttachShader(program, vertexShaderObject);
+        GLES20.glAttachShader(program, fragmentShaderObject);
         Log.d("abstractGLES20Util","setOnProgram finished");
 
         // プログラムオブジェクトをリンクする
         GLES20.glLinkProgram(program);
-        Log.d("abstractGLES20Util", "link Program finished");
+        Log.d("abstractGLES20Util","link Program finished");
 
         // リンク結果をチェックする
         int[] linked = new int[1];
@@ -150,8 +142,6 @@ public abstract class Shader {
             String error = GLES20.glGetProgramInfoLog(program);
             throw new RuntimeException("failed to link program: " + error);
         }
-
-        Log.d("abstractGLES20Util","end of initShader");
         return program;
     }
     /**
@@ -178,6 +168,7 @@ public abstract class Shader {
      * フラグメントシェーダの初期化
      */
     private static int initFragmentShader(String fragmentShaderString){
+        Log.d("Fragment String",fragmentShaderString);
         // ピクセルシェーダオブジェクトを作成する
         int fragmentShader = GLES20.glCreateShader( GLES20.GL_FRAGMENT_SHADER );
         // シェーダコードを読み込む
@@ -193,15 +184,17 @@ public abstract class Shader {
         }
         return fragmentShader;
     }
+    public abstract void draw(Model model, float x, float y, float z,
+                       float scaleX, float scaleY, float scaleZ,
+                       float degreeX, float degreeY, float degreeZ);
+    public abstract void draw(Mesh mesh, float x, float y, float z,
+                              float scaleX, float scaleY, float scaleZ,
+                              float degreeX, float degreeY, float degreeZ);
+    protected static void setShaderModelMatrix(float[] modelMatrix){
+        GLES20.glUniformMatrix4fv(GLES20Util.mu_modelMatrix, 1, false, modelMatrix, 0);
+    }
 
-    /**
-     * テクスチャ画像を設定する
-     * @param 使用する画像のbitmapデータ
-     */
-    //テクスチャ画像を設定する
-    protected static void setOnTexture(Bitmap image,int u_Sampler){
-        // テクスチャ画像を設定する
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0,image, 0);
-        GLES20.glUniform1i(u_Sampler,0);     // サンプラにテクスチャユニットを設定する
+    protected static void setShaderNormalMatrix(float[] normalMatrix){
+        GLES20.glUniformMatrix4fv(GLES20Util.mu_NormalMatrix, 1, false, normalMatrix, 0);
     }
 }

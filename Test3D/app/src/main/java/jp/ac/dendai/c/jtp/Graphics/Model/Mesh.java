@@ -11,10 +11,9 @@ import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
  * Created by Goto on 2016/08/04.
  */
 public class Mesh {
-    protected static float[] modelMatrix = new float[16];
     protected FloatBuffer vertex;
     protected IntBuffer index;
-    protected int vertexBufferObject,indexBufferObject;
+    protected int vertexBufferObject = -1,indexBufferObject = -1;
     protected Face[] faces;
     public int getVBO(){return vertexBufferObject;}
     public int getIBO(){return indexBufferObject;}

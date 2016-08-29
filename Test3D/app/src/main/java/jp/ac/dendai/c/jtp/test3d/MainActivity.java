@@ -15,6 +15,7 @@ import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.ImageReader;
 import jp.ac.dendai.c.jtp.Graphics.Line.Line;
 import jp.ac.dendai.c.jtp.Graphics.Model.Model;
+import jp.ac.dendai.c.jtp.Graphics.Model.ModelObject;
 import jp.ac.dendai.c.jtp.Graphics.Shader.DiffuseShader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
@@ -23,7 +24,6 @@ import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 import jp.ac.dendai.c.jtp.TouchUtil.TouchListener;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FpsController;
-import jp.ac.dendai.c.jtp.openglesutil.Util.Math.Vector3;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
 public class MainActivity extends Activity implements GLSurfaceView.Renderer{
@@ -33,11 +33,9 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     private Model mode;
     private Line line_x,line_y,line_z;
     private Camera camera;
+    private Camera uiCamera;
     private Shader shader;
-    private Model[] models;
-    private Vector3 pos;
-    private Vector3 rot;
-    private Vector3 scl;
+    private ModelObject[] objects;
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
@@ -133,28 +131,28 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     public void onSurfaceChanged(GL10 arg0, int width, int height) {
         Log.d("MainActivity", "onSurfaceChanged");
         // 表示領域を設定する
-        GLES20Util.initDrawErea(width, height);
+        GLES20Util.initDrawErea(width, height, true);
         //テクスチャの再読み込み
         //GLES20Util.initTextures();
-        //GLES20Util.initFpsBitmap(fpsImage, true, R.drawable.degital2);
+        GLES20Util.initFpsBitmap(fpsImage, true, R.drawable.degital2);
         Log.d("onSurfaceCreated", "initShader");
     }
 
     @Override
     public void onSurfaceCreated(GL10 arg0, EGLConfig arg1) {
-        String vertexShader = new String(FileManager.readShaderFile(this, "VSHADER.txt"));
-        String fragmentShader = new String(FileManager.readShaderFile(this,"FSHADER.txt"));
-        GLES20Util.initGLES20Util(vertexShader,fragmentShader);
+        String vertexShader = new String(FileManager.readShaderFile(this, "DiffuseShaderVertex.txt"));
+        String fragmentShader = new String(FileManager.readShaderFile(this,"DiffuseShaderFragment.txt"));
+        Shader.useTexture(1);
         shader = new DiffuseShader();
-        shader.loadShader();
-        shader.useShader();
-        models = WavefrontObjConverter.createModel("untitled.obj");
-        camera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,0f,0f,-10f);
-        pos = new Vector3();
-        rot = new Vector3();
-        scl = new Vector3(1,1,1);
+        GLES20Util.initGLES20Util(vertexShader,fragmentShader,false);
 
-        GLES20.glClearColor(0f, 0.0f, 0.0f, 1.0f); // 画面をクリアする色を設定する
+        objects = WavefrontObjConverter.createModel("untitled.obj");
+        objects[0].useBufferObject();
+        camera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,-10f,10f,10f);
+        uiCamera = new Camera(Camera.CAMERA_MODE.ORTHO,0,0,-10f);
+        shader.setCamera(uiCamera);
+
+        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f); // 画面をクリアする色を設定する
     }
     private void process(){
         fpsController.updateFps();
@@ -164,17 +162,15 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         // 描画領域をクリアする
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         shader.useShader();
-        camera.updateCamera();
+        shader.updateCamera();
         if(count % 60 == 0) {
             Log.d("FPS",String.valueOf(fpsController.getFps()));
         }
         count++;
         //Log.d("Touch",Input.getTouchArray()[0].toString());
-        //line_x.draw(0,0,0,50f,0,0);
-        //line_y.draw(0, 0, 0, 0, 50f, 0);
-        //line_z.draw(0,0,0,0,0,50f);
-        shader.draw(models[0],pos,rot,scl);
+        shader.draw(objects[0],0, 0, 0, 1f, 1f, 1f, rotateX, rotateY, 0);
         //mode.draw(0, 0, 0, 1f, 1f, 1f, rotateX, rotateY, 0);
+
 
         /*
         //文字の描画

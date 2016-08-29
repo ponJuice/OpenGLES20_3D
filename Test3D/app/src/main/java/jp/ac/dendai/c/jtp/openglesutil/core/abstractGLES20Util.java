@@ -20,6 +20,9 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
+
+import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
+
 /**
  * 2次元用画像描画クラス（なんで抽象クラスにしたのか本気で悩んでるwww）
  * @author
@@ -48,7 +51,7 @@ public abstract class abstractGLES20Util {
 	/**
 	 * プログラムオブジェクト
 	 */
-	protected static int program;						//プログラムオブジェクト
+	private static int program;						//プログラムオブジェクト
 	/**
 	 * 画面の幅
 	 */
@@ -71,7 +74,7 @@ public abstract class abstractGLES20Util {
 	/**
 	 * 頂点シェーダの頂点座標の格納場所
 	 */
-	protected static int ma_Position;			//頂点シェーダの頂点座標の格納場所
+	public static int ma_Position;			//頂点シェーダの頂点座標の格納場所
 	/**
 	 * 頂点シェーダのワールド行列用格納変数の場所
 	 */
@@ -83,15 +86,15 @@ public abstract class abstractGLES20Util {
 	/**
 	 * モデル行列格納場所
 	 */
-	private static int mu_modelMatrix;				//モデル行列格納場所
+	public static int mu_modelMatrix;				//モデル行列格納場所
 
-	protected static int va_Normal;
-	protected static int vu_LightColor;
-	protected static int vu_LightDirection;
-	protected static int mu_NormalMatrix;
-	protected static int vu_emmision;
+	public static int va_Normal;
+	public static int vu_LightColor;
+	public static int vu_LightDirection;
+	public static int mu_NormalMatrix;
+	public static int vu_emmision;
 
-	public final static Bitmap white;
+	protected static Bitmap white;
 	/**
 	 * サンプラーの場所
 	 */
@@ -168,10 +171,6 @@ public abstract class abstractGLES20Util {
 	protected static float[] invertMatrix = new float[16];
 	protected static float[] normalMatrix = new float[16];
 
-	static{
-		white = createBitmap(255,255,255,255);
-	}
-
 	public static float getWidth(){
 		return Width;
 	}
@@ -211,16 +210,18 @@ public abstract class abstractGLES20Util {
 	/**
 	 * GLES20を使えるようにします。onSurfaceCreatedで一番最初に呼び出してください
 	 */
-	public static void initGLES20Util(String vertexShaderString,String fragmentShaderString){
-		//シェーダの準備
-		//initShader(vertexShaderString, fragmentShaderString);
-		Log.d("abstractGLES20Util", "finished init shader");
-		//バッファの準備
-		//initBuffer();
-		Log.d("abstractGLES20Util","finished initBuffer");
-		//頂点バッファオブジェクトの作成
-		//createAndSetOnBufferObject();
-		Log.d("abstractGLES20Util", "finished createAndSetOnBufferObject");
+	public static void initGLES20Util(String vertexShaderString,String fragmentShaderString,boolean flag){
+		if(flag){
+			//シェーダの準備
+			initShader(vertexShaderString, fragmentShaderString);
+			Log.d("abstractGLES20Util", "finished init shader");
+			//バッファの準備
+			initBuffer();
+			Log.d("abstractGLES20Util", "finished initBuffer");
+			//頂点バッファオブジェクトの作成
+			createAndSetOnBufferObject();
+			Log.d("abstractGLES20Util", "finished createAndSetOnBufferObject");
+		}
 		//アルファブレンディングの有効化
 		GLES20.glEnable(GLES20.GL_BLEND);
 		//ブレンディングメソッドの有効化
@@ -228,8 +229,11 @@ public abstract class abstractGLES20Util {
 		//隠面消去の有効化
 		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 		//裏面を表示しない
-		//GLES20.glEnable(GLES20.GL_CULL_FACE);
-		//GLES20.glCullFace(GLES20.GL_BACK);
+		GLES20.glEnable(GLES20.GL_CULL_FACE);
+		GLES20.glCullFace(GLES20.GL_BACK);
+
+		//デフォルトテクスチャ作成
+		white = createBitmap(255,255,255,255);
 	}
 
 	/**
@@ -253,7 +257,7 @@ public abstract class abstractGLES20Util {
 
 	    // プログラムオブジェクトをリンクする
 	   	GLES20.glLinkProgram(program);
-	   	Log.d("abstractGLES20Util", "link Program finished");
+	   	Log.d("abstractGLES20Util","link Program finished");
 
 	    // リンク結果をチェックする
 	    int[] linked = new int[1];
@@ -264,11 +268,11 @@ public abstract class abstractGLES20Util {
 	    }
 		//プログラムの使用開始
 		GLES20.glUseProgram(program);
-		Log.d("abstractGLES20Util", "use stert Program finished");
+		Log.d("abstractGLES20Util","use stert Program finished");
 
 		//シェーダ内の変数場所を取得
 		getShaderLocation();
-		Log.d("abstractGLES20Util", "getShaderLocation finished");
+		Log.d("abstractGLES20Util","getShaderLocation finished");
 
 		Log.d("abstractGLES20Util","end of initShader");
 
@@ -296,6 +300,7 @@ public abstract class abstractGLES20Util {
 	 * フラグメントシェーダの初期化
 	 */
 	private static void initFragmentShader(String fragmentShaderString){
+		Log.d("Fragment String",fragmentShaderString);
 	    // ピクセルシェーダオブジェクトを作成する
 		fragmentShader = GLES20.glCreateShader( GLES20.GL_FRAGMENT_SHADER );
 		// シェーダコードを読み込む
@@ -359,12 +364,12 @@ public abstract class abstractGLES20Util {
 			throw new RuntimeException("a_texCoordの格納場所の取得に失敗");
 		}
 		//法線の取得
-		va_Normal = GLES20.glGetAttribLocation(program,"a_Normal");
+		/*va_Normal = GLES20.glGetAttribLocation(program,"a_Normal");
 		if(va_Normal == -1){
 			throw new RuntimeException("a_Normalの格納場所の取得に失敗");
-		}
+		}*/
 		//ライトの色
-		vu_LightColor = GLES20.glGetUniformLocation(program, "u_LightColor");
+		/*vu_LightColor = GLES20.glGetUniformLocation(program, "u_LightColor");
 		if(vu_LightColor == -1){
 			throw new RuntimeException("u_LightColorの格納場所の取得に失敗");
 		}
@@ -380,7 +385,7 @@ public abstract class abstractGLES20Util {
 		vu_emmision = GLES20.glGetUniformLocation(program,"u_emmision");
 		if(vu_emmision == -1){
 			throw new RuntimeException("u_emmisionの格納場所の取得に失");
-		}
+		}*/
 	}
 
 	/**
@@ -389,30 +394,19 @@ public abstract class abstractGLES20Util {
 	//シェーダにビューポート行列を設定
 	protected static void setShaderProjMatrix(){
 		GLES20.glUniformMatrix4fv(mu_ProjMatrix, 1,false,viewProjMatrix,0);
-	}
-
-	public static void setProjMatrix(float[] matrix){
-		GLES20.glUniformMatrix4fv(mu_ProjMatrix, 1,false,matrix,0);
-	}
-
-	public static void setProjMatrix(float[] matrix,int position){
-		GLES20.glUniformMatrix4fv(position, 1,false,matrix,0);
+		//GLES20.glUniformMatrix4fv(Shader.mu_ProjMatrix, 1,false,viewProjMatrix,0);
 	}
 
 	/**
 	 * シェーダにモデル行列を設定
 	 */
 	//シェーダにモデル行列を設定
-	public static void setShaderModelMatrix(float[] modelMatrix){
+	protected static void setShaderModelMatrix(float[] modelMatrix){
 		GLES20.glUniformMatrix4fv(mu_modelMatrix, 1, false, modelMatrix, 0);
 	}
 
-	public static void setShaderNormalMatrix(float[] normalMatrix){
+	protected static void setShaderNormalMatrix(float[] normalMatrix){
 		GLES20.glUniformMatrix4fv(mu_NormalMatrix, 1, false, normalMatrix, 0);
-	}
-
-	public static void setShaderModelMatrix(float[] modelMatrix,int position){
-		GLES20.glUniformMatrix4fv(position, 1, false, modelMatrix, 0);
 	}
 
 	/**
@@ -537,10 +531,10 @@ public abstract class abstractGLES20Util {
 	    if (u_Sampler == -1) {
 	      throw new RuntimeException("u_Samplerの格納場所の取得に失敗");
 	    }
-	    u_alpha = GLES20.glGetUniformLocation(program, "u_alpha");
+	    /*u_alpha = GLES20.glGetUniformLocation(program, "u_alpha");
 	    if(u_alpha == -1){
 	    	throw new RuntimeException("u_alphaの格納場所の取得に失敗");
-	    }
+	    }*/
 
 	    GLES20.glActiveTexture(GLES20.GL_TEXTURE0);   // テクスチャユニット0を有効にする
 
@@ -618,7 +612,7 @@ public abstract class abstractGLES20Util {
 	   * 表示領域を設定
 	   */
 	//表示領域を設定
- 	public static void initDrawErea(int width,int height){
+ 	public static void initDrawErea(int width,int height,boolean Perspective){
 		Width = width;
 		Height = height;
 
@@ -632,18 +626,30 @@ public abstract class abstractGLES20Util {
 
 
 		GLES20.glViewport(0, 0, width, height);
-		//float[] viewMatrix = new float[16];
+		/*float[] viewMatrix = new float[16];
+		if(Perspective){
+			setPerspectiveM(u_ProjMatrix,0,40.0,(double)width/height,1.0,100.0);
+		    Matrix.setLookAtM(viewMatrix, 0, -10f, 10f, 10f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+		    Matrix.multiplyMM(viewProjMatrix, 0, u_ProjMatrix, 0, viewMatrix, 0);
+		}
+		else{
+			Matrix.setIdentityM(viewMatrix,0);
+			Matrix.translateM(viewMatrix,0,-width_gl/2f,-height_gl/2f,0);
+			Matrix.orthoM(u_ProjMatrix,0,-aspect,aspect,-1.0f,1.0f,mNear/100,mFar/100);
+			Matrix.multiplyMM(viewProjMatrix,0,u_ProjMatrix,0,viewMatrix,0);
+			//viewProjMatrix = u_ProjMatrix;
+		}
 
-		//GLES20.glUniform3f(vu_LightColor, 1f, 1f, 1f);
-		//float[] lightDirection = new float[] { 0,1.0f,0};
-		//normalizeVector3(lightDirection);
-		//GLES20.glUniform3fv(vu_LightDirection,1,lightDirection,0);
+		GLES20.glUniform3f(vu_LightColor, 1f, 1f, 1f);
+		float[] lightDirection = new float[] { 0,1.0f,0};
+		normalizeVector3(lightDirection);
+		GLES20.glUniform3fv(vu_LightDirection,1,lightDirection,0);
 
 		//シェーダにワールド行列を設定
-		//setShaderProjMatrix();
+		setShaderProjMatrix();
 
 		//デバッグ
-		Log.d("GLES20Util:Width",String.valueOf(aspect));
+		Log.d("GLES20Util:Width",String.valueOf(aspect));*/
 	}
 
 	public static void setEmmision(float[] emmision){
@@ -659,12 +665,12 @@ public abstract class abstractGLES20Util {
 
 	//視体積の四角錐型の設定
 	protected static void setPerspectiveM(float[] m, int offset, double fovy, double aspect, double zNear, double zFar) {
-		Matrix.setIdentityM(m, offset);
-		double ymax = zNear * Math.tan(fovy * Math.PI / 360.0);
-		double ymin = -ymax;
-		double xmin = ymin * aspect;
-		double xmax = ymax * aspect;
-		Matrix.frustumM(m, offset, (float)xmin, (float)xmax, (float)ymin, (float)ymax, (float)zNear, (float)zFar);
-	  }
+		    Matrix.setIdentityM(m, offset);
+		    double ymax = zNear * Math.tan(fovy * Math.PI / 360.0);
+		    double ymin = -ymax;
+		    double xmin = ymin * aspect;
+		    double xmax = ymax * aspect;
+		    Matrix.frustumM(m, offset, (float)xmin, (float)xmax, (float)ymin, (float)ymax, (float)zNear, (float)zFar);
+		  }
 
 }

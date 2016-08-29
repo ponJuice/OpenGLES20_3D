@@ -13,6 +13,7 @@ import android.util.Log;
 import java.nio.FloatBuffer;
 
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
+import jp.ac.dendai.c.jtp.Graphics.Model.Face;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.Image;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
@@ -31,6 +32,21 @@ public class GLES20Util extends abstractGLES20Util {
 	}
 	public GLES20Util(){
 		Log.d("GLES20Util","Constract");
+	}
+
+	public static int getUniformLocation(int program,String name){
+		int temp = GLES20.glGetUniformLocation(program, name);
+		if (temp == -1) {
+			throw new RuntimeException(name+"の格納場所の取得に失敗");
+		}
+		return temp;
+	}
+	public static int getAttributeLocation(int program,String name){
+		int temp = GLES20.glGetAttribLocation(program, name);
+		if (temp == -1) {
+			throw new RuntimeException(name+"の格納場所の取得に失敗");
+		}
+		return temp;
 	}
 
 	public static float screenToInnerPosition(float value,GLES20UTIL_MODE mode){
@@ -98,34 +114,33 @@ public class GLES20Util extends abstractGLES20Util {
 		GLES20.glDisableVertexAttribArray(ma_Position);
 	}
 
-	public static void setCamera(Camera camera){
+	/*public static void setCamera(Camera camera){
 		if(camera.getCameraMode() == Camera.CAMERA_MODE.PERSPECTIVE){
 			if(camera.getPersUpdate())
-				setPerspectiveM(camera.getViewProjMatrix(),0,camera.getAngleOfView(),(double)Width/Height,camera.getNear(),camera.getmFar());
+				setPerspectiveM(u_ProjMatrix,0,camera.getAngleOfView(),(double)Width/Height,camera.getNear(),camera.getmFar());
 			if(camera.getPosUpdate())
-				Matrix.setLookAtM(camera.getTransformMatrix(), 0, camera.getPosition(Camera.POSITION.X),
+				Matrix.setLookAtM(camera.getMatrix(), 0, camera.getPosition(Camera.POSITION.X),
 														camera.getPosition(Camera.POSITION.Y),
 														camera.getPosition(Camera.POSITION.Z),
 														camera.getLookPosition(Camera.POSITION.X),
 														camera.getLookPosition(Camera.POSITION.Y),
 														camera.getLookPosition(Camera.POSITION.Z),
 														0.0f, 1.0f, 0.0f);
-			Matrix.multiplyMM(camera.getCameraMatrix(), 0, camera.getViewProjMatrix(), 0, camera.getTransformMatrix(), 0);
+			Matrix.multiplyMM(viewProjMatrix, 0, u_ProjMatrix, 0, camera.getMatrix(), 0);
 		}
 		else{
 			if(camera.getPosUpdate()) {
-				Matrix.setIdentityM(camera.getTransformMatrix(), 0);
-				Matrix.translateM(camera.getTransformMatrix(), 0, -width_gl / 2f, -height_gl / 2f, 0);
+				Matrix.setIdentityM(camera.getMatrix(), 0);
+				Matrix.translateM(camera.getMatrix(), 0, -width_gl / 2f, -height_gl / 2f, 0);
 			}
 			if(camera.getPersUpdate())
-				Matrix.orthoM(camera.getViewProjMatrix(),0,-aspect,aspect,-1.0f,1.0f,camera.getNear()/100f,camera.getmFar()/100f);
-			Matrix.multiplyMM(camera.getCameraMatrix(),0,camera.getViewProjMatrix(),0,camera.getTransformMatrix(),0);
+				Matrix.orthoM(u_ProjMatrix,0,-aspect,aspect,-1.0f,1.0f,camera.getNear()/100,camera.getmFar()/100);
+			Matrix.multiplyMM(viewProjMatrix,0,u_ProjMatrix,0,camera.getMatrix(),0);
 			//viewProjMatrix = u_ProjMatrix;
 		}
-
 		//シェーダにワールド行列を設定
-		setProjMatrix(camera.getCameraMatrix());
-	}
+		setShaderProjMatrix();
+	}*/
 
 	public static void DrawLine(FloatBuffer vertex,float x,float y,float z,float lengthX,float lengthY,float lengthZ,float[] color,float a,float width,GLES20COMPOSITIONMODE mode){
 		Matrix.setIdentityM(normalMatrix,0);
@@ -173,12 +188,30 @@ public class GLES20Util extends abstractGLES20Util {
 		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,4);	//描画
 	}
 
-	/*public static void DrawModel(float x,float y,float z,
+	public static void DrawModel(float x,float y,float z,
 								 float scaleX,float scaleY, float scaleZ,
 								 float degreeX,float degreeY,float degreeZ,
-								 Face[] face,float alpha,
+								 Face[] face,
 								 int vertexBufferObject,int indexBufferObject,int indexCount){
-		shader.setMatrix(x,y,z,scaleX,scaleY,scaleZ,degreeX,degreeY,degreeZ);
+		Matrix.setIdentityM(modelMatrix, 0);
+		Matrix.setIdentityM(invertMatrix, 0);
+		Matrix.setIdentityM(normalMatrix, 0);
+
+		Matrix.translateM(modelMatrix, 0, x, y, z);
+		if(scaleX != 0 || scaleY != 0 || scaleZ != 0)
+			Matrix.scaleM(modelMatrix, 0, scaleX, scaleY, scaleZ);
+		if(degreeZ != 0)
+			Matrix.rotateM(modelMatrix, 0, degreeZ, 0, 0, 1);
+		if(degreeY != 0)
+			Matrix.rotateM(modelMatrix, 0, degreeY, 0, 1, 0);
+		if(degreeX != 0)
+			Matrix.rotateM(modelMatrix, 0, degreeX, 1, 0, 0);
+
+		Matrix.invertM(invertMatrix, 0, modelMatrix, 0);
+		Matrix.transposeM(normalMatrix, 0, invertMatrix, 0);
+
+		setShaderModelMatrix(modelMatrix);
+		setShaderNormalMatrix(normalMatrix);
 
 		GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vertexBufferObject);
 		GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
@@ -193,7 +226,7 @@ public class GLES20Util extends abstractGLES20Util {
 		GLES20.glEnableVertexAttribArray(ma_texCoord);  // バッファオブジェクトの割り当ての有効化
 
 		for(int n = 0;n < face.length;n++) {
-			shader.setMaterial(face[n].material,alpha);
+			//face[n].matelial.setMatelial();
 			GLES20.glDrawElements(GLES20.GL_TRIANGLES, face[n].end-face[n].offset+1, GLES20.GL_UNSIGNED_INT, ISIZE*face[n].offset);
 		}
 		//GLES20.glDrawArrays(GLES20.GL_LINE_STRIP,0,8);
@@ -201,7 +234,7 @@ public class GLES20Util extends abstractGLES20Util {
 		GLES20.glDisableVertexAttribArray(va_Normal);
 		GLES20.glDisableVertexAttribArray(ma_texCoord);
 
-	}*/
+	}
 
 	public static void DrawGraph(float startX,float startY,float lengthX,float lengthY,Image img){
 		float scaleX = lengthX;

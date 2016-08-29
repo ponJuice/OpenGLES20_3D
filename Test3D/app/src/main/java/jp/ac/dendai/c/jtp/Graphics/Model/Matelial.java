@@ -2,6 +2,8 @@ package jp.ac.dendai.c.jtp.Graphics.Model;
 
 import android.graphics.Bitmap;
 
+import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
+
 /**
  * Created by Goto on 2016/07/21.
  */

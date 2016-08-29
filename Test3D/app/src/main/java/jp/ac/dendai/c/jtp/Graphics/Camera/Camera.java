@@ -3,6 +3,7 @@ package jp.ac.dendai.c.jtp.Graphics.Camera;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
+import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
 /**
@@ -18,18 +19,17 @@ public class Camera {
         Y,
         Z
     }
-    private float[] cameraMatrix = new float[16];               //最終的なマトリックス
-    private float[] viewProjMatrix = new float[16];             //射影マトリックス
-    private float[] uiCameraMatrix = new float[16];
-    private float[] transformMatrix = new float[16];            //移動回転拡縮マトリックス
+    private float[] cameraMatrix = new float[16];
+    private float[] viewProjMatrix = new float[16];
+    private float[] transformMatrix = new float[16];
     private CAMERA_MODE camera_mode;
-    private float x = 0f,y = 0f,z = -10f;
+    private float x = -10f,y = 10f,z = 10f;
     private float lx = 0,ly = 0,lz = 0;
     private float angleOfView = 40;
     private boolean update = false;
     private boolean posUpdate = false;
     private boolean persUpdate = false;
-    private float mNear=0.1f,mFar=100f;
+    private float mNear=1f,mFar=100f;
     public Camera(CAMERA_MODE mode,float x,float y,float z){
         update = true;
         posUpdate = true;
@@ -42,8 +42,8 @@ public class Camera {
     public float[] getCameraMatrix(){
         return cameraMatrix;
     }
-    public float[] getViewProjMatrix(){return viewProjMatrix;}
     public float[] getTransformMatrix(){return transformMatrix;}
+    public float[] getViewProjMatrix(){return viewProjMatrix;}
     public CAMERA_MODE getCameraMode(){
         return camera_mode;
     }
@@ -71,14 +71,13 @@ public class Camera {
     public float getmFar(){
         return mFar;
     }
-    public void updateCamera() {
+    public void updateCamera(Shader shader) {
         if (update) {
-            GLES20Util.setCamera(this);
+            setCamera(this);
+            GLES20.glUniformMatrix4fv(shader.getProjMatrixPosition(), 1,false,viewProjMatrix,0);
             update = false;
             persUpdate = false;
             posUpdate = false;
-        }else {
-            GLES20Util.setProjMatrix(cameraMatrix);
         }
     }
     public void setNear(float value){
@@ -137,11 +136,27 @@ public class Camera {
         double xmax = ymax * aspect;
         Matrix.frustumM(m, offset, (float)xmin, (float)xmax, (float)ymin, (float)ymax, (float)zNear, (float)zFar);
     }
-    public void testUICamera(){
-        Matrix.setIdentityM(transformMatrix,0);
-        Matrix.translateM(transformMatrix, 0, -GLES20Util.getWidth_gl() / 2f, -GLES20Util.getHeight_gl() / 2f, 0);
-        Matrix.orthoM(uiCameraMatrix, 0, -GLES20Util.getAspect(), GLES20Util.getAspect(), -1.0f, 1.0f, mNear / 100, mFar / 100);
-        Matrix.multiplyMM(uiCameraMatrix, 0, uiCameraMatrix, 0, transformMatrix, 0);
-        GLES20Util.setProjMatrix(uiCameraMatrix);
+    public static void setCamera(Camera camera) {
+        if (camera.getCameraMode() == Camera.CAMERA_MODE.PERSPECTIVE) {
+            if (camera.getPersUpdate())
+                setPerspectiveM(camera.getCameraMatrix(), 0, camera.getAngleOfView(), (double) GLES20Util.getWidth() / GLES20Util.getHight(), camera.getNear(), camera.getmFar());
+            if (camera.getPosUpdate())
+                Matrix.setLookAtM(camera.getTransformMatrix(), 0, camera.getPosition(Camera.POSITION.X),
+                        camera.getPosition(Camera.POSITION.Y),
+                        camera.getPosition(Camera.POSITION.Z),
+                        camera.getLookPosition(Camera.POSITION.X),
+                        camera.getLookPosition(Camera.POSITION.Y),
+                        camera.getLookPosition(Camera.POSITION.Z),
+                        0.0f, 1.0f, 0.0f);
+            Matrix.multiplyMM(camera.getViewProjMatrix(), 0, camera.getCameraMatrix(), 0, camera.getTransformMatrix(), 0);
+        } else {
+            if (camera.getPosUpdate()) {
+                Matrix.setIdentityM(camera.getTransformMatrix(), 0);
+                Matrix.translateM(camera.getTransformMatrix(), 0, camera.getPosition(POSITION.X), camera.getPosition(POSITION.Y), camera.getPosition(POSITION.Z));
+            }
+            if (camera.getPersUpdate())
+                Matrix.orthoM(camera.getCameraMatrix(), 0, -GLES20Util.getAspect(), GLES20Util.getAspect(), -1.0f, 1.0f, camera.getNear() / 100, camera.getmFar() / 100);
+            Matrix.multiplyMM(camera.getViewProjMatrix(), 0, camera.getCameraMatrix(), 0, camera.getTransformMatrix(), 0);
+        }
     }
 }

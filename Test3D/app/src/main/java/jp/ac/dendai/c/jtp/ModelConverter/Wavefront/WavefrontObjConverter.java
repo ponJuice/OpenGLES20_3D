@@ -8,13 +8,14 @@ import java.util.LinkedList;
 import jp.ac.dendai.c.jtp.Graphics.Model.Face;
 import jp.ac.dendai.c.jtp.Graphics.Model.Matelial;
 import jp.ac.dendai.c.jtp.Graphics.Model.Model;
+import jp.ac.dendai.c.jtp.Graphics.Model.ModelObject;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 
 public class WavefrontObjConverter {
-	public static Model[] createModel(String modelFileName){
+	public static ModelObject[] createModel(String modelFileName){
 		String code = FileManager.readTextFile(modelFileName);
 		Log.d("model fila",code);
-		LinkedList<Model> models = new LinkedList<>();
+		LinkedList<ModelObject> models = new LinkedList<>();
 		ObjVertexReader vr = new ObjVertexReader();
 		ObjNormalReader nr = new ObjNormalReader();
 		ObjUVReader ur = new ObjUVReader();
@@ -40,11 +41,9 @@ public class WavefrontObjConverter {
 				n = ur.read(lines, n);
 				n = nr.read(lines, n);
 				ir.read(lines, n, vr.getBuffer(), nr.getBuffer(), ur.getBuffer(), matelials);
-				models.add(new Model(
-						(Float[]) ir.getConvertVertex().toArray(new Float[0]),
+				models.add(new ModelObject((Float[]) ir.getConvertVertex().toArray(new Float[0]),
 						(Integer[]) ir.getIndex().toArray(new Integer[0]),
-						ir.getFace().toArray(new Face[0]))
-							);
+						ir.getFace().toArray(new Face[0])));
 
 				for(int a = 0;a < ir.getConvertVertex().size();a += 8){
 					String str = String.format("%+.1f %+.1f %+.1f , %+.1f %+.1f %+.1f , %+.3f %+.3f"
@@ -69,7 +68,7 @@ public class WavefrontObjConverter {
 				}
 			}
 		}
-		return models.toArray(new Model[0]);
+		return models.toArray(new ModelObject[0]);
 	}
 	public static String createModelFile(Model model){
 		StringBuilder sb = new StringBuilder();
