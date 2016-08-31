@@ -1,6 +1,8 @@
 package jp.ac.dendai.c.jtp.Graphics.Shader;
 
+import android.graphics.Bitmap;
 import android.opengl.GLES20;
+import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
 
@@ -39,6 +41,7 @@ public abstract class Shader {
      */
     protected int mu_modelMatrix;				//モデル行列格納場所
     protected int u_Sampler;
+    protected int u_alpha;
     protected Camera camera;
     public Shader(){}
     public Shader(String v,String f){
@@ -59,6 +62,8 @@ public abstract class Shader {
         mu_modelMatrix = GLES20Util.getUniformLocation(program, "u_ModelMatrix");
         //テクスチャの格納場所を取得
         ma_texCoord = GLES20Util.getAttributeLocation(program, "a_TexCoord");
+        //アルファ値
+        u_alpha = GLES20Util.getUniformLocation(program,"u_alpha");
         loadShaderVariable();
     }
 
@@ -104,6 +109,9 @@ public abstract class Shader {
     protected void _useShader(){
         GLES20.glUseProgram(program);
         useProgram = program;
+        if(!GLES20.glIsEnabled(GLES20.GL_DEPTH_TEST)){
+            GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+        }
     }
 
     //シェーダ―変数の取得
@@ -151,15 +159,16 @@ public abstract class Shader {
         //頂点シェーダオブジェクトを作成
         int vertexShader = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
         // シェーダコードを読み込む
-        GLES20.glShaderSource( vertexShader,vertexShaderString);
+        GLES20.glShaderSource(vertexShader, vertexShaderString);
         // シェーダコードをコンパイルする
-        GLES20.glCompileShader( vertexShader );
+        GLES20.glCompileShader(vertexShader);
         // コンパイル結果を検査する
         int[] compiled = new int[1];
         GLES20.glGetShaderiv(vertexShader, GLES20.GL_COMPILE_STATUS, compiled, 0);
         if (compiled[0] != GLES20.GL_TRUE) {
             String error = GLES20.glGetShaderInfoLog(vertexShader);
-            throw new RuntimeException("failed to compile shader: " + error);
+            Log.d("Vertex String [ERROE]",vertexShaderString);
+            throw new RuntimeException("failed to compile shader: " + error + "\n" + vertexShaderString);
         }
         return vertexShader;
     }
@@ -168,7 +177,6 @@ public abstract class Shader {
      * フラグメントシェーダの初期化
      */
     private static int initFragmentShader(String fragmentShaderString){
-        Log.d("Fragment String",fragmentShaderString);
         // ピクセルシェーダオブジェクトを作成する
         int fragmentShader = GLES20.glCreateShader( GLES20.GL_FRAGMENT_SHADER );
         // シェーダコードを読み込む
@@ -180,7 +188,8 @@ public abstract class Shader {
         GLES20.glGetShaderiv(fragmentShader, GLES20.GL_COMPILE_STATUS, compiled, 0);
         if (compiled[0] != GLES20.GL_TRUE) {
             String error = GLES20.glGetShaderInfoLog(fragmentShader);
-            throw new RuntimeException("failed to compile shader: " + error);
+            Log.d("Fragment String [ERROE]",fragmentShaderString);
+            throw new RuntimeException("failed to compile shader: " + error +"\n"+fragmentShaderString);
         }
         return fragmentShader;
     }
@@ -189,12 +198,23 @@ public abstract class Shader {
                        float degreeX, float degreeY, float degreeZ);
     public abstract void draw(Mesh mesh, float x, float y, float z,
                               float scaleX, float scaleY, float scaleZ,
-                              float degreeX, float degreeY, float degreeZ);
+                              float degreeX, float degreeY, float degreeZ,float alpha);
     protected static void setShaderModelMatrix(float[] modelMatrix){
         GLES20.glUniformMatrix4fv(GLES20Util.mu_modelMatrix, 1, false, modelMatrix, 0);
     }
 
     protected static void setShaderNormalMatrix(float[] normalMatrix){
         GLES20.glUniformMatrix4fv(GLES20Util.mu_NormalMatrix, 1, false, normalMatrix, 0);
+    }
+
+    /**
+     * テクスチャ画像を設定する
+     * @param 使用する画像のbitmapデータ
+     */
+    //テクスチャ画像を設定する
+    protected static void setOnTexture(Bitmap image, int u_Sampler){
+        // テクスチャ画像を設定する
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
+        GLES20.glUniform1i(u_Sampler, 0);     // サンプラにテクスチャユニットを設定する
     }
 }

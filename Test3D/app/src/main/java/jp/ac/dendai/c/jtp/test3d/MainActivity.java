@@ -16,8 +16,10 @@ import jp.ac.dendai.c.jtp.Graphics.ImageReader;
 import jp.ac.dendai.c.jtp.Graphics.Line.Line;
 import jp.ac.dendai.c.jtp.Graphics.Model.Model;
 import jp.ac.dendai.c.jtp.Graphics.Model.ModelObject;
+import jp.ac.dendai.c.jtp.Graphics.Model.Texture;
 import jp.ac.dendai.c.jtp.Graphics.Shader.DiffuseShader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
+import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
 import jp.ac.dendai.c.jtp.TouchUtil.Input;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
@@ -25,6 +27,7 @@ import jp.ac.dendai.c.jtp.TouchUtil.TouchListener;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FpsController;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
+import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     private FpsController fpsController = new FpsController((short)60);
@@ -35,6 +38,8 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     private Camera camera;
     private Camera uiCamera;
     private Shader shader;
+    private UiShader uiShader;
+    private Texture tex;
     private ModelObject[] objects;
 
     @Override
@@ -111,8 +116,9 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         Input.getTouchArray()[0].addTouchListener(new TouchListener() {
             @Override
             public void execute(Touch t) {
-                rotateY += t.getDelta(Touch.Pos_Flag.X) * 0.1f;
-                rotateX += t.getDelta(Touch.Pos_Flag.Y) * 0.1f;
+                rotateY += t.getDelta(Touch.Pos_Flag.X) * 0.001f;
+                rotateX += t.getDelta(Touch.Pos_Flag.Y) * 0.001f;
+                //Log.d("Touch","("+rotateX+","+rotateY+")");
                 //camera.setAngleOfView(camera.getAngleOfView()+(t.getDelta(Touch.Pos_Flag.Y) * 0.01f));
                 //camera.addPosition(-t.getDelta(Touch.Pos_Flag.X) * 0.1f,t.getDelta(Touch.Pos_Flag.X) * 0.1f,t.getDelta(Touch.Pos_Flag.X) * 0.1f);
             }
@@ -144,13 +150,20 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         String fragmentShader = new String(FileManager.readShaderFile(this,"DiffuseShaderFragment.txt"));
         Shader.useTexture(1);
         shader = new DiffuseShader();
-        GLES20Util.initGLES20Util(vertexShader,fragmentShader,false);
+        uiShader = new UiShader();
+        GLES20Util.initGLES20Util(vertexShader, fragmentShader, false);
 
-        objects = WavefrontObjConverter.createModel("untitled.obj");
+        objects = WavefrontObjConverter.createModel("Sphear.obj");
         objects[0].useBufferObject();
+
+        tex = new Texture(GLES20Util.loadBitmap(R.drawable.block),GLES20COMPOSITIONMODE.ALPHA);
+        tex.setBufferObject();
+
         camera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,-10f,10f,10f);
-        uiCamera = new Camera(Camera.CAMERA_MODE.ORTHO,0,0,-10f);
-        shader.setCamera(uiCamera);
+        uiCamera = new Camera(Camera.CAMERA_MODE.ORTHO,0,0,10f);
+        uiCamera.setNear(0.1f);
+        shader.setCamera(camera);
+        uiShader.setCamera(uiCamera);
 
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f); // 画面をクリアする色を設定する
     }
@@ -161,16 +174,21 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     private void draw(){
         // 描画領域をクリアする
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-        shader.useShader();
-        shader.updateCamera();
         if(count % 60 == 0) {
             Log.d("FPS",String.valueOf(fpsController.getFps()));
         }
         count++;
         //Log.d("Touch",Input.getTouchArray()[0].toString());
-        shader.draw(objects[0],0, 0, 0, 1f, 1f, 1f, rotateX, rotateY, 0);
+        shader.useShader();
+        shader.updateCamera();
+        shader.draw(objects[0], 0, 0, 0, 1f, 1f, 1f, rotateX, rotateY, 0,1f);
+        shader.draw(objects[0], 0, 0, -10f, 1f, 1f, 1f, rotateX, rotateY, 0,1f);
+        shader.draw(objects[0], 0, 0, -20f, 1f, 1f, 1f, rotateX, rotateY, 0,1f);
         //mode.draw(0, 0, 0, 1f, 1f, 1f, rotateX, rotateY, 0);
 
+        uiShader.useShader();
+        uiShader.updateCamera();
+        uiShader.draw(tex,rotateY,rotateX,1f,1f,0,1f);
 
         /*
         //文字の描画

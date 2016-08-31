@@ -152,10 +152,10 @@ public class Camera {
         } else {
             if (camera.getPosUpdate()) {
                 Matrix.setIdentityM(camera.getTransformMatrix(), 0);
-                Matrix.translateM(camera.getTransformMatrix(), 0, camera.getPosition(POSITION.X), camera.getPosition(POSITION.Y), camera.getPosition(POSITION.Z));
+                //Matrix.translateM(camera.getTransformMatrix(), 0, camera.getPosition(POSITION.X), camera.getPosition(POSITION.Y), camera.getPosition(POSITION.Z));
             }
             if (camera.getPersUpdate())
-                Matrix.orthoM(camera.getCameraMatrix(), 0, -GLES20Util.getAspect(), GLES20Util.getAspect(), -1.0f, 1.0f, camera.getNear() / 100, camera.getmFar() / 100);
+                Matrix.orthoM(camera.getCameraMatrix(), 0, -GLES20Util.getAspect(), GLES20Util.getAspect(), -1.0f, 1.0f, camera.getNear(), camera.getmFar());
             Matrix.multiplyMM(camera.getViewProjMatrix(), 0, camera.getCameraMatrix(), 0, camera.getTransformMatrix(), 0);
         }
     }

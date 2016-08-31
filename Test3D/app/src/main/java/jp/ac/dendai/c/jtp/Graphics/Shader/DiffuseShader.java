@@ -64,7 +64,7 @@ public class DiffuseShader extends Shader{
     }
 
     @Override
-    public void draw(Mesh mesh, float x, float y, float z, float scaleX, float scaleY, float scaleZ, float degreeX, float degreeY, float degreeZ) {
+    public void draw(Mesh mesh, float x, float y, float z, float scaleX, float scaleY, float scaleZ, float degreeX, float degreeY, float degreeZ,float alpha) {
         Matrix.setIdentityM(modelMatrix, 0);
 
         Matrix.translateM(modelMatrix, 0, x, y, z);
@@ -88,22 +88,13 @@ public class DiffuseShader extends Shader{
         GLES20.glVertexAttribPointer(ma_texCoord, 2, GLES20.GL_FLOAT, false, GLES20Util.FSIZE * 8, GLES20Util.FSIZE * 6);
         GLES20.glEnableVertexAttribArray(ma_texCoord);  // バッファオブジェクトの割り当ての有効化
 
+        GLES20.glUniform1f(u_alpha,alpha);
+
         for(int n = 0;n < mesh.getFaces().length;n++) {
             setMaterial(mesh.getFaces()[n]);
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, mesh.getFaces()[n].end - mesh.getFaces()[n].offset + 1, GLES20.GL_UNSIGNED_INT, GLES20Util.ISIZE * mesh.getFaces()[n].offset);
         }
         GLES20.glDisableVertexAttribArray(ma_Position);
         GLES20.glDisableVertexAttribArray(ma_texCoord);
-    }
-
-    /**
-     * テクスチャ画像を設定する
-     * @param 使用する画像のbitmapデータ
-     */
-    //テクスチャ画像を設定する
-    protected static void setOnTexture(Bitmap image, int u_Sampler){
-        // テクスチャ画像を設定する
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0,image, 0);
-        GLES20.glUniform1i(u_Sampler,0);     // サンプラにテクスチャユニットを設定する
     }
 }

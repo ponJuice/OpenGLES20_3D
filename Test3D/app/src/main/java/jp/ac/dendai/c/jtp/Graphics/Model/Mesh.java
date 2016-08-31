@@ -2,6 +2,8 @@ package jp.ac.dendai.c.jtp.Graphics.Model;
 
 import android.opengl.GLES20;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -32,4 +34,50 @@ public class Mesh {
         return bufferObjects;
     }
     public Face[] getFaces(){return faces;}
+    public static FloatBuffer makeFloatBuffer(float[] array) {
+        if (array == null) throw new IllegalArgumentException();
+
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * array.length);
+        byteBuffer.order(ByteOrder.nativeOrder());
+        FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
+        floatBuffer.put(array);
+        floatBuffer.position(0);
+        return floatBuffer;
+    }
+
+    public static FloatBuffer makeFloatBuffer(Float[] array) {
+        if (array == null) throw new IllegalArgumentException();
+
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * array.length);
+        byteBuffer.order(ByteOrder.nativeOrder());
+        FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
+        for (Float f : array) {
+            floatBuffer.put((float) f);
+        }
+        floatBuffer.position(0);
+        return floatBuffer;
+    }
+
+    public static IntBuffer makeIntBuffer(int[] array) {
+        if (array == null) throw new IllegalArgumentException();
+
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(Integer.SIZE / 8 * array.length);
+        byteBuffer.order(ByteOrder.nativeOrder());
+        IntBuffer intBuffer = byteBuffer.asIntBuffer();
+        intBuffer.put(array).position(0);
+        return intBuffer;
+    }
+
+    public static IntBuffer makeIntBuffer(Integer[] array) {
+        if (array == null) throw new IllegalArgumentException();
+
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(Integer.SIZE / 8 * array.length);
+        byteBuffer.order(ByteOrder.nativeOrder());
+        IntBuffer intBuffer = byteBuffer.asIntBuffer();
+        for (Integer f : array) {
+            intBuffer.put((int) f);
+        }
+        intBuffer.position(0);
+        return intBuffer;
+    }
 }
