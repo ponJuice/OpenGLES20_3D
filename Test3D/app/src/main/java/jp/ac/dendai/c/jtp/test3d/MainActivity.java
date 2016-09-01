@@ -11,12 +11,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.ImageReader;
 import jp.ac.dendai.c.jtp.Graphics.Line.Line;
 import jp.ac.dendai.c.jtp.Graphics.Model.Model;
 import jp.ac.dendai.c.jtp.Graphics.Model.ModelObject;
 import jp.ac.dendai.c.jtp.Graphics.Model.Texture;
+import jp.ac.dendai.c.jtp.Graphics.Renderer.MeshRenderer;
 import jp.ac.dendai.c.jtp.Graphics.Shader.DiffuseShader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
@@ -37,6 +39,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     private Line line_x,line_y,line_z;
     private Camera camera;
     private Camera uiCamera;
+    private GameObject[] gameObjects;
     private Shader shader;
     private UiShader uiShader;
     private Texture tex;
@@ -148,16 +151,31 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     public void onSurfaceCreated(GL10 arg0, EGLConfig arg1) {
         String vertexShader = new String(FileManager.readShaderFile(this, "DiffuseShaderVertex.txt"));
         String fragmentShader = new String(FileManager.readShaderFile(this,"DiffuseShaderFragment.txt"));
+        //テクスチャを１枚使えるようにする
         Shader.useTexture(1);
+        //シェーダの作成
         shader = new DiffuseShader();
         uiShader = new UiShader();
+        //OpenGLES20のもろもろを使えるようにする
         GLES20Util.initGLES20Util(vertexShader, fragmentShader, false);
 
+        //オブジェクトファイルの読み込み
         objects = WavefrontObjConverter.createModel("Sphear.obj");
+        //バッファオブジェクトを使用する
         objects[0].useBufferObject();
 
+        //UI用のテクスチャ読み込み
         tex = new Texture(GLES20Util.loadBitmap(R.drawable.block),GLES20COMPOSITIONMODE.ALPHA);
+        //バッファオブジェクトを使用する
         tex.setBufferObject();
+
+        //ゲームオブジェクトを作成
+        gameObjects = new GameObject[2];
+        gameObjects[0] = new GameObject();
+        gameObjects[1] = new GameObject();
+        //メッシュレンダーを登録
+        gameObjects[0].setMeshRenderer(new MeshRenderer(gameObjects[0],shader,objects[0]));
+        gameObjects[1].setMeshRenderer(new MeshRenderer(gameObjects[1],shader,objects[1]));
 
         camera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,-10f,10f,10f);
         uiCamera = new Camera(Camera.CAMERA_MODE.ORTHO,0,0,10f);
