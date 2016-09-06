@@ -107,13 +107,13 @@ public class Physics3D implements Physics {
     public void preparation(){
         PhysicsItem temp = ite;
         do{
-            if(!ite.object.freeze) {
-                ite.object.bufferVelocity.zeroReset();
-                ite.object.bufferPos.zeroReset();
-                ite.object.bufferRot.zeroReset();
-                ite.object.bufferScl.zeroReset();
+            if(temp.object != null &&!temp.object.freeze) {
+                temp.object.bufferVelocity.zeroReset();
+                temp.object.bufferPos.zeroReset();
+                temp.object.bufferRot.zeroReset();
+                temp.object.bufferScl.zeroReset();
             }
-            ite = ite.next;
+            temp = temp.prev;
         }while(temp != ite);
     }
     @Override
@@ -121,12 +121,12 @@ public class Physics3D implements Physics {
         //重力
         PhysicsItem temp = ite;
         do{
-            if(ite.object.useGravity && !ite.object.freeze) {
+            if(temp.object != null && temp.object.useGravity && !temp.object.freeze) {
                 buffer.copy(info.gravity);
                 buffer.scalarMult(deltaTime);
-                ite.object.bufferVelocity.add(buffer);
+                temp.object.bufferVelocity.add(buffer);
             }
-            ite = ite.next;
+            temp = temp.next;
         }while(temp != ite);
     }
 
@@ -136,12 +136,37 @@ public class Physics3D implements Physics {
         for(int n = 0;n < info.maxObject;n++){
             if(objects[n].object == null)
                 continue;
-            for(int m = 1+n;m < info.maxObject;n++){
+            for(int m = 1+n;m < info.maxObject;m++){
                 if(objects[m].object == null)
                     continue;
                 if(ACollider.isCollision(objects[n].object.gameObject.getCollider(),objects[m].object.gameObject.getCollider())){
-                    objects[n].object.gameObject.collEnter(objects[m].object.gameObject.getCollider());
-                    objects[m].object.gameObject.collEnter(objects[n].object.gameObject.getCollider());
+                    if(objects[n].object.collisionMode == PhysicsObject.COLLISION.NON){
+                        //始めて接触した→STAYに移行
+                        objects[n].object.gameObject.collEnter(objects[m].object.gameObject.getCollider());
+                        objects[n].object.collisionMode = PhysicsObject.COLLISION.STAY;
+                    }else if(objects[n].object.collisionMode == PhysicsObject.COLLISION.STAY){
+                        //接触し続けている→そのまま
+                        objects[n].object.gameObject.collStay();
+                    }
+                    if(objects[m].object.collisionMode == PhysicsObject.COLLISION.NON){
+                        //始めて接触した→STAYに移行
+                        objects[m].object.gameObject.collEnter(objects[n].object.gameObject.getCollider());
+                        objects[m].object.collisionMode = PhysicsObject.COLLISION.STAY;
+                    }else if(objects[m].object.collisionMode == PhysicsObject.COLLISION.STAY){
+                        //接触し続けている→そのまま
+                        objects[m].object.gameObject.collStay();
+                    }
+                }else{
+                    if(objects[n].object.collisionMode == PhysicsObject.COLLISION.STAY){
+                        //離れた→NONに移行
+                        objects[n].object.gameObject.collExit();
+                        objects[n].object.collisionMode = PhysicsObject.COLLISION.NON;
+                    }
+                    if(objects[m].object.collisionMode == PhysicsObject.COLLISION.STAY){
+                        //離れた→NONに移行
+                        objects[m].object.gameObject.collExit();
+                        objects[m].object.collisionMode = PhysicsObject.COLLISION.NON;
+                    }
                 }
             }
         }
@@ -151,13 +176,13 @@ public class Physics3D implements Physics {
     public void updatePosProc(float deltaTime) {
         PhysicsItem temp = ite;
         do{
-            if(!ite.object.freeze) {
-                ite.object.velocity.add(ite.object.bufferVelocity);
-                ite.object.bufferPos.copy(ite.object.velocity);
-                ite.object.bufferPos.scalarMult(deltaTime);
-                ite.object.gameObject.getPos().add(ite.object.bufferPos);
+            if(temp.object != null && !temp.object.freeze) {
+                temp.object.velocity.add(temp.object.bufferVelocity);
+                temp.object.bufferPos.copy(temp.object.velocity);
+                temp.object.bufferPos.scalarMult(deltaTime);
+                temp.object.gameObject.getPos().add(temp.object.bufferPos);
             }
-            ite = ite.next;
+            temp = temp.next;
         }while(temp != ite);
     }
 

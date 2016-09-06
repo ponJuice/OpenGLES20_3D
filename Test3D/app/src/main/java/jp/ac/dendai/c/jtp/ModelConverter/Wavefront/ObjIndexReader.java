@@ -3,8 +3,8 @@ package jp.ac.dendai.c.jtp.ModelConverter.Wavefront;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import jp.ac.dendai.c.jtp.Graphics.Model.Face;
-import jp.ac.dendai.c.jtp.Graphics.Model.Matelial;
+import jp.ac.dendai.c.jtp.Graphics.Model.Material.Face;
+import jp.ac.dendai.c.jtp.Graphics.Model.Material.Matelial;
 
 /**
  * Created by Goto on 2016/07/26.

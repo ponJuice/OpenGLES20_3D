@@ -1,4 +1,4 @@
-package jp.ac.dendai.c.jtp.Graphics.Model;
+package jp.ac.dendai.c.jtp.Graphics.Model.Model;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

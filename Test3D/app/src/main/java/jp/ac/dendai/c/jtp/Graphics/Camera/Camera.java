@@ -23,7 +23,7 @@ public class Camera {
     private float[] viewProjMatrix = new float[16];
     private float[] transformMatrix = new float[16];
     private CAMERA_MODE camera_mode;
-    private float x = -10f,y = 10f,z = 10f;
+    private float x = 0,y = 0,z = 0;
     private float lx = 0,ly = 0,lz = 0;
     private float angleOfView = 40;
     private boolean update = false;
@@ -155,7 +155,7 @@ public class Camera {
                 //Matrix.translateM(camera.getTransformMatrix(), 0, camera.getPosition(POSITION.X), camera.getPosition(POSITION.Y), camera.getPosition(POSITION.Z));
             }
             if (camera.getPersUpdate())
-                Matrix.orthoM(camera.getCameraMatrix(), 0, -GLES20Util.getAspect(), GLES20Util.getAspect(), -1.0f, 1.0f, camera.getNear(), camera.getmFar());
+                Matrix.orthoM(camera.getCameraMatrix(), 0, -GLES20Util.getAspect()/2f + camera.getPosition(POSITION.X), GLES20Util.getAspect()/2f + camera.getPosition(POSITION.X), -0.5f+camera.getPosition(POSITION.Y), 0.5f+camera.getPosition(POSITION.Y), camera.getNear(), camera.getmFar());
             Matrix.multiplyMM(camera.getViewProjMatrix(), 0, camera.getCameraMatrix(), 0, camera.getTransformMatrix(), 0);
         }
     }

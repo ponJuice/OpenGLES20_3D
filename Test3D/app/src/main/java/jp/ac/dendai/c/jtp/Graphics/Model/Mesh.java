@@ -7,25 +7,24 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import jp.ac.dendai.c.jtp.Graphics.Model.Material.Face;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
 /**
  * Created by Goto on 2016/08/04.
  */
-public class Mesh {
+public abstract class Mesh {
     protected FloatBuffer vertex;
     protected IntBuffer index;
-    protected int vertexBufferObject = -1,indexBufferObject = -1;
-    protected Face[] faces;
-    public int getVBO(){return vertexBufferObject;}
-    public int getIBO(){return indexBufferObject;}
+    public abstract int getVBO();
+    public abstract int getIBO();
     public FloatBuffer getVertexBuffer(){return vertex;}
     public IntBuffer getIndexBuffer(){return index;}
     protected void setVertexBufferObject(){
-        GLES20Util.setVertexBuffer(vertexBufferObject, vertex, GLES20.GL_STATIC_DRAW);
+        GLES20Util.setVertexBuffer(getVBO(), vertex, GLES20.GL_STATIC_DRAW);
     }
     protected void setIndexBufferObject(){
-        GLES20Util.setIndexBuffer(indexBufferObject, index, GLES20.GL_STATIC_DRAW);
+        GLES20Util.setIndexBuffer(getIBO(), index, GLES20.GL_STATIC_DRAW);
     }
     protected int[] createBufferObject(int num){
         // バッファオブジェクトを作成する
@@ -33,7 +32,7 @@ public class Mesh {
         GLES20.glGenBuffers(num,bufferObjects, 0);
         return bufferObjects;
     }
-    public Face[] getFaces(){return faces;}
+    public abstract Face[] getFaces();
     public static FloatBuffer makeFloatBuffer(float[] array) {
         if (array == null) throw new IllegalArgumentException();
 

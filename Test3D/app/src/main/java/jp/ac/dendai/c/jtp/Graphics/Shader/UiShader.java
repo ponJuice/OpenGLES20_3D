@@ -3,9 +3,9 @@ package jp.ac.dendai.c.jtp.Graphics.Shader;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
-import jp.ac.dendai.c.jtp.Graphics.Model.Face;
+import jp.ac.dendai.c.jtp.Graphics.Model.Material.Face;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
-import jp.ac.dendai.c.jtp.Graphics.Model.Model;
+import jp.ac.dendai.c.jtp.Graphics.Model.Model.Model;
 import jp.ac.dendai.c.jtp.Graphics.Model.Texture;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
@@ -46,6 +46,11 @@ public class UiShader extends Shader{
 
     }
 
+    @Override
+    public void draw(Texture tex, float x, float y, float z, float scaleX, float scaleY, float scaleZ, float degreeX, float degreeY, float degreeZ, float alpha) {
+        draw(tex,x,y,scaleX,scaleY,degreeZ,alpha);
+    }
+
     public void draw(Texture tex,float x, float y, float lengthX, float lengthY,float degree,float alpha){
         //裏面を表示しない
         //GLES20.glCullFace(GLES20.GL_FRONT_AND_BACK);
@@ -63,7 +68,7 @@ public class UiShader extends Shader{
         GLES20.glUniform1f(u_alpha,alpha);
 
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, tex.getVertexBufferObject());
-        GLES20.glVertexAttribPointer(ma_Position, 2, GLES20.GL_FLOAT, false, 0, 0);
+        GLES20.glVertexAttribPointer(ma_Position, 3, GLES20.GL_FLOAT, false, 0, 0);
         GLES20.glEnableVertexAttribArray(ma_Position);  // バッファオブジェクトの割り当ての有効化
 
         //テクスチャの有効化

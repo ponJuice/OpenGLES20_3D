@@ -13,10 +13,10 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
  */
 public class Texture {
     protected static final float[] plane = {
-            -0.5f,-0.5f,
-            0.5f,-0.5f,
-            -0.5f,0.5f,
-            0.5f,0.5f
+            -0.5f,-0.5f,0,
+            0.5f,-0.5f,0,
+            -0.5f,0.5f,0,
+            0.5f,0.5f,0
     };
     protected static final float[] texPos = {
             0.0f,1.0f,

@@ -1,4 +1,4 @@
-package jp.ac.dendai.c.jtp.Graphics.Model;
+package jp.ac.dendai.c.jtp.Graphics.Model.Material;
 
 /**
  * Created by Goto on 2016/07/26.

@@ -12,10 +12,13 @@ public abstract class ACollider {
     public GameObject getGameObject(){
         return gameObject;
     }
+    public void setGameObject(GameObject gameObject){
+        this.gameObject = gameObject;
+    }
     public abstract Vector[] getDirect();
 
     public static boolean isCollision(CircleCollider A,CircleCollider B){
-        if(A.radius + B.radius > Vector.distanceAtoB(A.gameObject.getPos(),B.gameObject.getPos())){
+        if(A.radius + B.radius <= Vector.distanceAtoB(A.gameObject.getPos(),B.gameObject.getPos())){
             return false;
         }else{
             return true;

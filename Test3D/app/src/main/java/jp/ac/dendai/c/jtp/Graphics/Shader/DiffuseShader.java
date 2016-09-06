@@ -1,13 +1,12 @@
 package jp.ac.dendai.c.jtp.Graphics.Shader;
 
-import android.graphics.Bitmap;
 import android.opengl.GLES20;
-import android.opengl.GLUtils;
 import android.opengl.Matrix;
 
-import jp.ac.dendai.c.jtp.Graphics.Model.Face;
+import jp.ac.dendai.c.jtp.Graphics.Model.Material.Face;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
-import jp.ac.dendai.c.jtp.Graphics.Model.Model;
+import jp.ac.dendai.c.jtp.Graphics.Model.Model.Model;
+import jp.ac.dendai.c.jtp.Graphics.Model.Texture;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
@@ -94,6 +93,34 @@ public class DiffuseShader extends Shader{
             setMaterial(mesh.getFaces()[n]);
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, mesh.getFaces()[n].end - mesh.getFaces()[n].offset + 1, GLES20.GL_UNSIGNED_INT, GLES20Util.ISIZE * mesh.getFaces()[n].offset);
         }
+        GLES20.glDisableVertexAttribArray(ma_Position);
+        GLES20.glDisableVertexAttribArray(ma_texCoord);
+    }
+
+    @Override
+    public void draw(Texture tex, float x, float y, float z, float scaleX, float scaleY, float scaleZ, float degreeX, float degreeY, float degreeZ, float alpha) {
+        Matrix.setIdentityM(modelMatrix, 0);
+        Matrix.translateM(modelMatrix, 0, x, y, -10f);
+        Matrix.scaleM(modelMatrix, 0, scaleX, scaleY, 1.0f);
+        Matrix.rotateM(modelMatrix, 0, degreeZ, 0, 0, 1);
+        setShaderModelMatrix(modelMatrix);
+
+        setOnTexture(tex.getTexture(), u_Sampler);
+
+        tex.getBlendMode().setBlendMode();
+        GLES20.glUniform1f(u_alpha,alpha);
+
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, tex.getVertexBufferObject());
+        GLES20.glVertexAttribPointer(ma_Position, 3, GLES20.GL_FLOAT, false, 0, 0);
+        GLES20.glEnableVertexAttribArray(ma_Position);  // バッファオブジェクトの割り当ての有効化
+
+        //テクスチャの有効化
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, tex.getTextureBufferObject());
+        GLES20.glVertexAttribPointer(ma_texCoord, 2, GLES20.GL_FLOAT, false, 0, 0);
+        GLES20.glEnableVertexAttribArray(ma_texCoord);  // バッファオブジェクトの割り当ての有効化
+
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);	//描画
+
         GLES20.glDisableVertexAttribArray(ma_Position);
         GLES20.glDisableVertexAttribArray(ma_texCoord);
     }

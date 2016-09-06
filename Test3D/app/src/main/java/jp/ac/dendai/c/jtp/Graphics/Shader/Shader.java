@@ -3,13 +3,13 @@ package jp.ac.dendai.c.jtp.Graphics.Shader;
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
-import android.opengl.Matrix;
 import android.util.Log;
 
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
-import jp.ac.dendai.c.jtp.Graphics.Model.Face;
+import jp.ac.dendai.c.jtp.Graphics.Model.Material.Face;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
-import jp.ac.dendai.c.jtp.Graphics.Model.Model;
+import jp.ac.dendai.c.jtp.Graphics.Model.Model.Model;
+import jp.ac.dendai.c.jtp.Graphics.Model.Texture;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
 /**
@@ -197,6 +197,9 @@ public abstract class Shader {
                        float scaleX, float scaleY, float scaleZ,
                        float degreeX, float degreeY, float degreeZ);
     public abstract void draw(Mesh mesh, float x, float y, float z,
+                              float scaleX, float scaleY, float scaleZ,
+                              float degreeX, float degreeY, float degreeZ,float alpha);
+    public abstract void draw(Texture tex, float x, float y, float z,
                               float scaleX, float scaleY, float scaleZ,
                               float degreeX, float degreeY, float degreeZ,float alpha);
     protected static void setShaderModelMatrix(float[] modelMatrix){

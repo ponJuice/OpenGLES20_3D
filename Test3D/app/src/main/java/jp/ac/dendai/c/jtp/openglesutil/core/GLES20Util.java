@@ -12,8 +12,7 @@ import android.util.Log;
 
 import java.nio.FloatBuffer;
 
-import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
-import jp.ac.dendai.c.jtp.Graphics.Model.Face;
+import jp.ac.dendai.c.jtp.Graphics.Model.Material.Face;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.Image;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 

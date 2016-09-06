@@ -2,8 +2,8 @@ package jp.ac.dendai.c.jtp.ModelConverter.Wavefront;
 
 import java.util.HashMap;
 
-import jp.ac.dendai.c.jtp.Graphics.ImageReader;
-import jp.ac.dendai.c.jtp.Graphics.Model.Matelial;
+import jp.ac.dendai.c.jtp.openglesutil.Util.ImageReader;
+import jp.ac.dendai.c.jtp.Graphics.Model.Material.Matelial;
 
 /**
  * Created by Goto on 2016/07/21.

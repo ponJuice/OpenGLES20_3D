@@ -5,10 +5,10 @@ import android.util.Log;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import jp.ac.dendai.c.jtp.Graphics.Model.Face;
-import jp.ac.dendai.c.jtp.Graphics.Model.Matelial;
-import jp.ac.dendai.c.jtp.Graphics.Model.Model;
-import jp.ac.dendai.c.jtp.Graphics.Model.ModelObject;
+import jp.ac.dendai.c.jtp.Graphics.Model.Material.Face;
+import jp.ac.dendai.c.jtp.Graphics.Model.Material.Matelial;
+import jp.ac.dendai.c.jtp.Graphics.Model.Model.Model;
+import jp.ac.dendai.c.jtp.Graphics.Model.Model.ModelObject;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 
 public class WavefrontObjConverter {

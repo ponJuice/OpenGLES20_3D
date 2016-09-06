@@ -1,4 +1,4 @@
-package jp.ac.dendai.c.jtp.Graphics.Model;
+package jp.ac.dendai.c.jtp.Graphics.Model.Material;
 
 import android.graphics.Bitmap;
 

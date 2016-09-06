@@ -7,7 +7,9 @@ import jp.ac.dendai.c.jtp.Math.Vector;
  */
 public class CircleCollider extends ACollider{
     protected float radius;
-
+    public CircleCollider(float radius){
+        this.radius  = radius;
+    }
     @Override
     public Vector[] getDirect() {
         return new Vector[0];

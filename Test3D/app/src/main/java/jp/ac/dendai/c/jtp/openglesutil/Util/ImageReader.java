@@ -1,4 +1,4 @@
-package jp.ac.dendai.c.jtp.Graphics;
+package jp.ac.dendai.c.jtp.openglesutil.Util;
 
 import android.app.Activity;
 import android.content.res.AssetManager;
