@@ -128,6 +128,14 @@ public class Camera {
             return lz;
         }
     }
+
+    public float convertTouchPosToGLPosX(float dispPosX){
+        return dispPosX / GLES20Util.getWidth() + (x - GLES20Util.getAspect()/2f);
+    }
+    public float convertTouchPosToGLPosY(float dispPosY){
+        return dispPosY / GLES20Util.getHight() + (y - 0.5f);
+    }
+
     private static void setPerspectiveM(float[] m, int offset, double fovy, double aspect, double zNear, double zFar) {
         Matrix.setIdentityM(m, offset);
         double ymax = zNear * Math.tan(fovy * Math.PI / 360.0);

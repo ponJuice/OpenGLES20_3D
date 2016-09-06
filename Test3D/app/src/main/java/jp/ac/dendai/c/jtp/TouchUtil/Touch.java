@@ -1,8 +1,12 @@
 package jp.ac.dendai.c.jtp.TouchUtil;
 
+import android.content.res.Configuration;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+
+import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
 public class Touch{
 	public enum Pos_Flag{
@@ -14,38 +18,50 @@ public class Touch{
 	protected float deltaX;
 	protected float deltaY;
 	protected int touchID;
-	protected List<TouchListener> tl;
+	protected TouchListener tl;
 	public Touch(){
 		x = 0;
 		y = 0;
 		deltaX = 0;
 		deltaY = 0;
 		touchID = -1;
-		tl = new LinkedList<TouchListener>();
 	}
 
 	public void addTouchListener(TouchListener l){
-		tl.add(l);
+		tl = l;
 	}
 
 	public void removeTouchListener(TouchListener l){
-		tl.remove(l);
+		//tl.remove(l);
 	}
 
 	public void setTouch(float x,float y,int touchID){
-		this.x = x;
-		this.y = y;
+		this.x = getOrientPosition(x,y,Pos_Flag.X);
+		this.y = getOrientPosition(x,y,Pos_Flag.Y);
 		this.touchID = touchID;
 		deltaX = 0;
 		deltaY = 0;
 	}
 	public void updatePosition(float x,float y){
-		deltaX = this.x - x;
-		deltaY = this.y - y;
-		this.x = x;
-		this.y = y;
-		for (TouchListener l : tl ) {
-			l.execute(this);
+		deltaX = this.x - getOrientPosition(x,y,Pos_Flag.X);
+		deltaY = this.y - getOrientPosition(x,y,Pos_Flag.Y);
+		this.x = getOrientPosition(x,y,Pos_Flag.X);
+		this.y = getOrientPosition(x,y,Pos_Flag.Y);
+		tl.execute(this);
+	}
+	private float getOrientPosition(float x,float y,Pos_Flag flag){
+		if(flag == Pos_Flag.X){
+			if(Input.getOrientation() == 2){
+				return GLES20Util.getHight()-y;
+			}else {
+				return x;
+			}
+		}else{
+			if(Input.getOrientation() == 2){
+				return x;
+			}else {
+				return y;
+			}
 		}
 	}
 	public float getPosition(Pos_Flag pos){

@@ -1,0 +1,10 @@
+//UTF-8N　改行コードCR+LFで保存すること
+varying vec2 v_TexCoord; 	//テクスチャ座標用のvarying変数
+attribute vec2 a_TexCoord;	//テクスチャ座標
+attribute vec4 a_Position;	//頂点
+uniform mat4 u_ModelMatrix;	//モデル変換行列
+uniform mat4 u_ProjMatrix;	//ワールド行列
+void main() {
+  gl_Position = u_ProjMatrix * u_ModelMatrix * a_Position;
+  v_TexCoord = a_TexCoord;	//フラグシェーダにテクスチャ座標を渡す
+}

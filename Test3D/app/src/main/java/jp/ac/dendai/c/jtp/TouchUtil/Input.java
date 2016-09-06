@@ -1,6 +1,7 @@
 package jp.ac.dendai.c.jtp.TouchUtil;
 
 public class Input{
+	private static int orientation;
 	private static int touchCount;
 	private static Touch[] touch;
 	private static int maxTouch;
@@ -11,6 +12,12 @@ public class Input{
 		for(int n = 0;n < 2 ;n++){
 			touch[n] = new Touch();
 		}
+	}
+	public static void setOrientation(int _orientation){
+		orientation = _orientation;
+	}
+	public static int getOrientation(){
+		return orientation;
 	}
 	public static void setTouchCount(int count){
 		touchCount = count;

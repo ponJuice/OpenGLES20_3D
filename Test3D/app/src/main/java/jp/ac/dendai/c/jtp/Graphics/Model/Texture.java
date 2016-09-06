@@ -12,11 +12,20 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
  * Created by wark on 2016/08/30.
  */
 public class Texture {
+    public enum COLOR{
+        R,
+        G,
+        B
+    }
     protected static final float[] plane = {
-            -0.5f,-0.5f,0,
+            /*-0.5f,-0.5f,0,
             0.5f,-0.5f,0,
             -0.5f,0.5f,0,
-            0.5f,0.5f,0
+            0.5f,0.5f,0*/
+            0,0,0,
+            1f,0,0,
+            0,1f,0,
+            1f,1f,0
     };
     protected static final float[] texPos = {
             0.0f,1.0f,
@@ -26,10 +35,28 @@ public class Texture {
     };
     protected static int[] bufferObject = {-1,-1};  //0:頂点 1:テクスチャ座標
 
+    protected float r=0.5f,g=0.5f,b=0.5f;
     protected Bitmap texture;
     protected GLES20COMPOSITIONMODE mode;
     public Bitmap getTexture(){
         return texture;
+    }
+    public float getColor(COLOR col){
+        if(col == COLOR.R)
+            return r;
+        else if(col == COLOR.G)
+            return g;
+        else
+            return b;
+    }
+    public void setR(float value){
+        r = value;
+    }
+    public void setG(float value){
+        g = value;
+    }
+    public void setB(float value){
+        b = value;
     }
     public void setTexture(Bitmap texture){
         this.texture = texture;

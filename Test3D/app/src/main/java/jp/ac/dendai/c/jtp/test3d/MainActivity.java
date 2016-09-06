@@ -10,11 +10,13 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Game.Player;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.Model.Primitive.Plane;
+import jp.ac.dendai.c.jtp.Graphics.UI.Button.Button;
 import jp.ac.dendai.c.jtp.Math.Vector3;
 import jp.ac.dendai.c.jtp.Physics.Collider.CircleCollider;
 import jp.ac.dendai.c.jtp.Physics.Physics.Physics;
@@ -52,6 +54,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     private Camera uiCamera;
     private Camera testCamera;
     private GameObject[] gameObjects;
+    private Button button;
     private Player player;
     private Physics3D physics;
     private Shader shader;
@@ -117,6 +120,11 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //フルスクリーン、ステータスバー非表示、ナビゲーションバー非表示
+        /*View decor = this.getWindow().getDecorView();
+        decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);*/
+
         // OpenGL ES 2.0が使用できるように初期化する
         GLSurfaceView glSurfaceView = GLES20Util.initGLES20(this, this);
 
@@ -131,6 +139,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
 
         //タッチマネージャーを使えるようにする
         Input.setMaxTouch(1);
+        Input.setOrientation(getResources().getConfiguration().orientation);
 
         Log.d("onCreate", "onCreate finished");}
 
@@ -149,7 +158,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         //テクスチャの再読み込み
         //GLES20Util.initTextures();
         GLES20Util.initFpsBitmap(fpsImage, true, R.drawable.degital2);
-        uiCamera.setPosition(GLES20Util.getAspect()/2f,0.5f,0);
+        uiCamera.setPosition(GLES20Util.getAspect() / 2f, 0.5f, 0);
         Log.d("onSurfaceCreated", "initShader");
     }
 
@@ -205,8 +214,8 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         Input.getTouchArray()[0].addTouchListener(new TouchListener() {
             @Override
             public void execute(Touch t) {
-                rotateY += t.getDelta(Touch.Pos_Flag.X) * 0.1f;
-                rotateX += t.getDelta(Touch.Pos_Flag.Y) * 0.1f;
+                rotateX += t.getDelta(Touch.Pos_Flag.X) * 0.1f;
+                rotateY += t.getDelta(Touch.Pos_Flag.Y) * 0.1f;
 
                 if(rotateX <= -90f)
                     rotateX = -89f;
@@ -268,11 +277,38 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         uiShader.setCamera(uiCamera);
         testShader.setCamera(testCamera);
 
+        //ボタンを作成
+        button = new Button(0,0.125f,0.125f,0);
+        button.setCamera(uiCamera);
+        button.setBackground(tex);
+
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // 画面をクリアする色を設定する
+    }
+    private void tempTouchProcess(Touch t){
+        if(t.getTouchID() == -1)
+            return;
+        rotateX += t.getDelta(Touch.Pos_Flag.X) * 0.1f;
+        rotateY += t.getDelta(Touch.Pos_Flag.Y) * 0.1f;
+
+        if(rotateX <= -90f)
+            rotateX = -89f;
+        else if(rotateX >= 90f)
+            rotateX = 89f;
+
+        if(rotateY < -90f)
+            rotateY = -90f;
+        else if(rotateY > 90f)
+            rotateY = 90f;
+
+        player.getRot().setY(rotateY);
+        player.getRot().setX(-rotateX);
     }
     private void process(){
         fpsController.updateFps();
         player.proc();
+        //tempTouchProcess(Input.getTouchArray()[0]);
+        button.touch(Input.getTouchArray()[0]);
+        button.proc();
         //physics.simulate();
     }
     private int count = 0;
@@ -293,7 +329,8 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
 
         uiShader.useShader();
         uiShader.updateCamera();
-        uiShader.draw(tex,0.125f,0.125f,0.25f,0.25f,0,1f);
+        button.draw(uiShader);
+        //uiShader.draw(tex,0.125f,0.125f,0.25f,0.25f,0,1f);
         //uiShader.draw(tex,0.25f,0.25f,0.5f,0.5f,0,1f);
 
         /*

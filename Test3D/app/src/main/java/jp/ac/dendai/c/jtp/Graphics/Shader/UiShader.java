@@ -14,9 +14,10 @@ import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
  * Created by wark on 2016/08/30.
  */
 public class UiShader extends Shader{
+    private int uv_color;
     public UiShader(){
-        super(FileManager.readTextFile("DiffuseShaderVertex.txt")
-                ,FileManager.readTextFile("DiffuseShaderFragment.txt"));
+        super(FileManager.readTextFile("UIVertexShader.txt")
+                ,FileManager.readTextFile("UIFragmentShader.txt"));
 
     }
 
@@ -29,6 +30,7 @@ public class UiShader extends Shader{
     @Override
     void loadShaderVariable() {
         u_Sampler = GLES20Util.getUniformLocation(program, "u_Sampler");
+        uv_color = GLES20Util.getUniformLocation(program,"u_color");
     }
 
     @Override
@@ -65,7 +67,8 @@ public class UiShader extends Shader{
         setOnTexture(tex.getTexture(), u_Sampler);
 
         tex.getBlendMode().setBlendMode();
-        GLES20.glUniform1f(u_alpha,alpha);
+        GLES20.glUniform1f(u_alpha, alpha);
+        GLES20.glUniform3f(uv_color,tex.getColor(Texture.COLOR.R),tex.getColor(Texture.COLOR.G),tex.getColor(Texture.COLOR.B));
 
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, tex.getVertexBufferObject());
         GLES20.glVertexAttribPointer(ma_Position, 3, GLES20.GL_FLOAT, false, 0, 0);
