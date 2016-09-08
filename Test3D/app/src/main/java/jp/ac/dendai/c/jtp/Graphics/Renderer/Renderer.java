@@ -97,8 +97,9 @@ public class Renderer {
         shader.updateCamera();
         RenderItem temp = ite;
         do{
-            if(temp.rm != null)
+            if(temp.rm != null && temp.rm.isDraw) {
                 temp.rm.draw();
+            }
             temp = temp.prev;
         }while(temp != null && temp != ite);
     }

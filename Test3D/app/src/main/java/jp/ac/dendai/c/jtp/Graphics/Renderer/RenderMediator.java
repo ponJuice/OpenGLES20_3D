@@ -12,6 +12,7 @@ public class RenderMediator {
     public GameObject gameObject;
     public Renderer renderer;
     public Renderer.RenderItem item;
+    public boolean isDraw = true;
     public void draw(){
         if(mesh == null || renderer == null)
             return;

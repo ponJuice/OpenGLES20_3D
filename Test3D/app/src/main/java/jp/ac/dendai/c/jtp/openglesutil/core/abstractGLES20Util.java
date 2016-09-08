@@ -621,8 +621,8 @@ public abstract class abstractGLES20Util {
 
 		aspect = (float)width/(float)height;
 
-		height_gl = 2.0f;
-		width_gl = aspect*2.0f;
+		height_gl = 1.0f;
+		width_gl = aspect;
 
 		Log.d("initDrawErea","Device Size:("+width+" , "+ height+") GL Size:("+height_gl+" , "+width_gl+")");
 

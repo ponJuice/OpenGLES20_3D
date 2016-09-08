@@ -12,7 +12,7 @@ import jp.ac.dendai.c.jtp.Graphics.Model.Model.ModelObject;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 
 public class WavefrontObjConverter {
-	public static ModelObject[] createModel(String modelFileName){
+	public static ModelObject createModel(String modelFileName){
 		String code = FileManager.readTextFile(modelFileName);
 		Log.d("model fila",code);
 		LinkedList<ModelObject> models = new LinkedList<>();
@@ -68,7 +68,7 @@ public class WavefrontObjConverter {
 				}
 			}
 		}
-		return models.toArray(new ModelObject[0]);
+		return models.get(0);
 	}
 	public static String createModelFile(Model model){
 		StringBuilder sb = new StringBuilder();

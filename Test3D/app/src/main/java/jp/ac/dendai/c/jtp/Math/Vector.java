@@ -34,4 +34,52 @@ public abstract class Vector {
                             +(b.getY()-a.getY())*(b.getY()-a.getY())
                             +(b.getZ()-a.getZ())*(b.getZ()-a.getZ()));
     }
+    public static void rotateX(float rad,Vector vec,Vector out){
+        float x = vec.getX();
+        float y = vec.getY() * (float)Math.cos(rad) - vec.getZ() * (float)Math.sin(rad);
+        float z = vec.getY() * (float)Math.sin(rad) + vec.getZ() * (float)Math.cos(rad);
+        out.setX(x);
+        out.setY(y);
+        out.setZ(z);
+    }
+    public static void rotateY(float rad,Vector vec,Vector out){
+        float x = vec.getX() * (float)Math.cos(rad) + vec.getZ() * (float)Math.sin(rad);
+        float y = vec.getY();
+        float z = vec.getX() * (float)Math.sin(rad) + vec.getZ() * (float)Math.cos(rad);
+        out.setX(x);
+        out.setY(y);
+        out.setZ(z);
+    }
+    public static void rotateZ(float rad,Vector vec,Vector out){
+        float x = vec.getX() * (float)Math.cos(rad) - vec.getY() * (float)Math.sin(rad);
+        float y = vec.getX() * (float)Math.sin(rad) + vec.getY() * (float)Math.cos(rad);
+        float z = vec.getZ();
+        out.setX(x);
+        out.setY(y);
+        out.setZ(z);
+    }
+    public static void rotateX(double rad,Vector vec,Vector out){
+        float x = vec.getX();
+        float y = vec.getY() * (float)Math.cos(rad) - vec.getZ() * (float)Math.sin(rad);
+        float z = vec.getY() * (float)Math.sin(rad) + vec.getZ() * (float)Math.cos(rad);
+        out.setX(x);
+        out.setY(y);
+        out.setZ(z);
+    }
+    public static void rotateY(double rad,Vector vec,Vector out){
+        float x = vec.getX() * (float)Math.cos(rad) + vec.getZ() * (float)Math.sin(rad);
+        float y = vec.getY();
+        float z = vec.getX() * (float)Math.sin(rad) + vec.getZ() * (float)Math.cos(rad);
+        out.setX(x);
+        out.setY(y);
+        out.setZ(z);
+    }
+    public static void rotateZ(double rad,Vector vec,Vector out){
+        float x = vec.getX() * (float)Math.cos(rad) - vec.getY() * (float)Math.sin(rad);
+        float y = vec.getX() * (float)Math.sin(rad) + vec.getY() * (float)Math.cos(rad);
+        float z = vec.getZ();
+        out.setX(x);
+        out.setY(y);
+        out.setZ(z);
+    }
 }

@@ -67,7 +67,7 @@ public class DiffuseShader extends Shader{
         Matrix.setIdentityM(modelMatrix, 0);
 
         Matrix.translateM(modelMatrix, 0, x, y, z);
-        if(scaleX != 0 || scaleY != 0 || scaleZ != 0)
+        if(scaleX != 1 || scaleY != 1 || scaleZ != 1)
             Matrix.scaleM(modelMatrix, 0, scaleX, scaleY, scaleZ);
         if(degreeZ != 0)
             Matrix.rotateM(modelMatrix, 0, degreeZ, 0, 0, 1);
@@ -89,10 +89,9 @@ public class DiffuseShader extends Shader{
 
         GLES20.glUniform1f(u_alpha,alpha);
 
-        for(int n = 0;n < mesh.getFaces().length;n++) {
-            setMaterial(mesh.getFaces()[n]);
-            GLES20.glDrawElements(GLES20.GL_TRIANGLES, mesh.getFaces()[n].end - mesh.getFaces()[n].offset + 1, GLES20.GL_UNSIGNED_INT, GLES20Util.ISIZE * mesh.getFaces()[n].offset);
-        }
+        setMaterial(mesh.getFaces()[0]);
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, mesh.getFaces()[0].end - mesh.getFaces()[0].offset + 1, GLES20.GL_UNSIGNED_INT, GLES20Util.ISIZE * mesh.getFaces()[0].offset);
+
         GLES20.glDisableVertexAttribArray(ma_Position);
         GLES20.glDisableVertexAttribArray(ma_texCoord);
     }

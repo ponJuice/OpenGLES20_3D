@@ -17,6 +17,8 @@ import jp.ac.dendai.c.jtp.Game.Player;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.Model.Primitive.Plane;
 import jp.ac.dendai.c.jtp.Graphics.UI.Button.Button;
+import jp.ac.dendai.c.jtp.Graphics.UI.Button.ButtonListener;
+import jp.ac.dendai.c.jtp.Math.Vector;
 import jp.ac.dendai.c.jtp.Math.Vector3;
 import jp.ac.dendai.c.jtp.Physics.Collider.CircleCollider;
 import jp.ac.dendai.c.jtp.Physics.Physics.Physics;
@@ -39,6 +41,7 @@ import jp.ac.dendai.c.jtp.TouchUtil.TouchListener;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FpsController;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
+import jp.ac.dendai.c.jtp.openglesutil.graphic.Image;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 public class MainActivity extends Activity implements GLSurfaceView.Renderer{
@@ -61,7 +64,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     private UiShader uiShader;
     private DiffuseShader testShader;
     private Texture tex;
-    private ModelObject[] objects;
+    private ModelObject box,gird;
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
@@ -176,46 +179,64 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         GLES20Util.initGLES20Util(vertexShader, fragmentShader, false);
 
         //オブジェクトファイルの読み込み
-        objects = WavefrontObjConverter.createModel("untitled.obj");
+        box = WavefrontObjConverter.createModel("untitled.obj");
+        gird = WavefrontObjConverter.createModel("gird.obj");
         //バッファオブジェクトを使用する
-        objects[0].useBufferObject();
+        box.useBufferObject();
+        gird.useBufferObject();
 
         //プリミティブ型
         plane = new Plane();
         plane.useBufferObject();
-        plane.setImage(GLES20Util.loadBitmap(R.drawable.block));
+        plane.setImage(ImageReader.readImageToAssets("Block.png"));
 
         //UI用のテクスチャ読み込み
-        tex = new Texture(GLES20Util.loadBitmap(R.drawable.block),GLES20COMPOSITIONMODE.ALPHA);
+        tex = new Texture(ImageReader.readImageToAssets("Block.png"),GLES20COMPOSITIONMODE.ALPHA);
         //バッファオブジェクトを使用する
         tex.setBufferObject();
 
         //ゲームオブジェクトを作成
-        gameObjects = new GameObject[2];
+        gameObjects = new GameObject[4];
         gameObjects[0] = new GameObject();
         gameObjects[1] = new GameObject();
+        gameObjects[2] = new GameObject();
+        gameObjects[3] = new GameObject();
         //メッシュをゲームオブジェクトに登録
-        gameObjects[0].getRenderMediator().mesh = objects[0];
-        gameObjects[1].getRenderMediator().mesh = plane;
+        gameObjects[0].getRenderMediator().mesh = box;
+        gameObjects[1].getRenderMediator().mesh = gird;
+        gameObjects[2].getRenderMediator().mesh = plane;
+        gameObjects[3].getRenderMediator().mesh = box;
         //コライダ―の設定
-        gameObjects[0].setCollider(new CircleCollider(1));
+        gameObjects[0].setCollider(new CircleCollider(0.05f));
         gameObjects[1].setCollider(new CircleCollider(1));
+        gameObjects[2].setCollider(new CircleCollider(1));
+        gameObjects[2].setCollider(new CircleCollider(1));
+        gameObjects[3].setCollider(new CircleCollider(0.5f));
         //ゲームオブジェクトの位置を変更
         gameObjects[0].getPos().setX(-2.0f);
-        gameObjects[1].getPos().setY(-1f);
-        gameObjects[1].getScl().setX(50f);
-        gameObjects[1].getScl().setY(50f);
-        gameObjects[1].getScl().setZ(50f);
+        gameObjects[1].getPos().setZ(0.5f);
+        gameObjects[2].getScl().setX(50f);
+        gameObjects[2].getScl().setY(50f);
+        gameObjects[2].getScl().setZ(50f);
+        gameObjects[2].getPos().setY(-4.5f);
+        gameObjects[2].getPos().setZ(-25f);
+        gameObjects[3].getPos().setZ(-25);
+
+        //あたり判定用の処理を追加
 
         //プレイヤー
         player = new Player();
-        player.getRenderMediator().mesh = objects[0];
+        player.getPos().zeroReset();
+        player.getRenderMediator().mesh = box;
+        player.getScl().setX(0.1f);
+        player.getScl().setY(0.1f);
+        player.getScl().setZ(0.1f);
         //タッチリスナで動かせるように
         Input.getTouchArray()[0].addTouchListener(new TouchListener() {
             @Override
             public void execute(Touch t) {
-                rotateX += t.getDelta(Touch.Pos_Flag.X) * 0.1f;
-                rotateY += t.getDelta(Touch.Pos_Flag.Y) * 0.1f;
+                rotateX += t.getDelta(Touch.Pos_Flag.Y) * 0.1f;
+                rotateY += t.getDelta(Touch.Pos_Flag.X) * 0.1f;
 
                 if(rotateX <= -90f)
                     rotateX = -89f;
@@ -235,17 +256,25 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         //物理計算用クラス作成
         PhysicsInfo info = new PhysicsInfo();
         info.enabled = true;
-        info.gravity = new Vector3(0,0,0);
+        info.gravity = new Vector3(0,-0.98f,0);
         info.maxObject = 3;
         physics = new Physics3D(info);
         PhysicsObject po = new PhysicsObject(gameObjects[0]);
-        po.useGravity = false;
+        po.gameObject.getScl().setX(0.05f);
+        po.gameObject.getScl().setY(0.05f);
+        po.gameObject.getScl().setZ(0.05f);
+        po.gameObject.getPos().setY(10f);
+        po.gameObject.getPos().setZ(-5f);
+        po.useGravity = true;
         po.freeze = false;
         physics.addObject(po);
-        po = new PhysicsObject(gameObjects[1]);
-        po.useGravity = false;
-        po.freeze = false;
-        physics.addObject(po);
+        PhysicsObject po2 = new PhysicsObject(gameObjects[3]);
+        po2.useGravity = false;
+        physics.addObject(po2);
+        //po = new PhysicsObject(gameObjects[1]);
+        //po.useGravity = false;
+        //po.freeze = false;
+        //physics.addObject(po);
 
         //レンダラを作成
         renderer = new Renderer();
@@ -256,18 +285,23 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         //レンダラに表示したいオブジェクトを登録
         renderer.addItem(gameObjects[0]);
         renderer.addItem(gameObjects[1]);
+        renderer.addItem(gameObjects[2]);
 
         testRenderer.addItem(gameObjects[0]);
         testRenderer.addItem(gameObjects[1]);
+        testRenderer.addItem(gameObjects[2]);
+        testRenderer.addItem(gameObjects[3]);
         testRenderer.addItem(player);
 
 
         //カメラを作成
-        camera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,-10f,10f,10f);
+        camera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,-10f,10f,10f,0,0,0);
         camera.setFar(1000f);
-        uiCamera = new Camera(Camera.CAMERA_MODE.ORTHO,0,0,10f);
+        uiCamera = new Camera(Camera.CAMERA_MODE.ORTHO,0,0,10f,0,0,0);
         uiCamera.setNear(0.1f);
-        testCamera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,0,0,0);
+        testCamera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,0,0,0,0,0,-1);
+        testCamera.setFar(1000f);
+        testCamera.setNear(0.01f);
 
         //カメラを登録
         player.setCamera(testCamera);
@@ -281,6 +315,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         button = new Button(0,0.125f,0.125f,0);
         button.setCamera(uiCamera);
         button.setBackground(tex);
+        button.setButtonListener(new TestButtonListener(player,po));
 
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // 画面をクリアする色を設定する
     }
@@ -307,9 +342,12 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         fpsController.updateFps();
         player.proc();
         //tempTouchProcess(Input.getTouchArray()[0]);
-        button.touch(Input.getTouchArray()[0]);
+        for(int n = 0;n < Input.getMaxTouch();n++) {
+            button.touch(Input.getTouchArray()[n]);
+        }
+        //gameObjects[3].getPos().setX(3f * (float)Math.sin(6.28f * ((float)count / 120f)));
         button.proc();
-        //physics.simulate();
+        physics.simulate();
     }
     private int count = 0;
     private void draw(){
@@ -318,6 +356,12 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         if(count % 60 == 0) {
             Log.d("FPS",String.valueOf(fpsController.getFps()));
         }
+        /*testShader.useShader();
+        testShader.updateCamera();
+        for(int n = 0;n < 6;n++) {
+            testShader.draw(plane,(float)n*0.1f,0,5f,0.5f,0.5f,0.5f,-90f,0,0,1);
+        }*/
+
         count++;
         //Log.d("Touch",Input.getTouchArray()[0].toString());
         testRenderer.drawAll();
@@ -326,6 +370,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         //shader.updateCamera();
         //shader.draw(gameObjects[0].getRenderMediator().mesh,0,0,0,1,1,1,0,0,0,1);
         //mode.draw(0, 0, 0, 1f, 1f, 1f, rotateX, rotateY, 0);
+
 
         uiShader.useShader();
         uiShader.updateCamera();
@@ -340,5 +385,35 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         */
         //FPSの表示
         //GLES20Util.DrawFPS(0, 1.0f, fpsController.getFps(), fpsImage, 0.5f);
+    }
+
+    class TestButtonListener implements ButtonListener{
+        PhysicsObject target;
+        Player player;
+        public TestButtonListener(Player player,PhysicsObject target){
+            this.target = target;
+            this.player = player;
+        }
+
+        @Override
+        public void touchDown(Button button) {
+
+        }
+
+        @Override
+        public void touchHover(Button button) {
+
+        }
+
+        @Override
+        public void touchUp(Button button) {
+            target.gameObject.getPos().copy(player.getPos());
+            target.gameObject.getRot().copy(player.getRot());
+            target.velocity.zeroReset();
+            target.velocity.setZ(-1);
+            Vector.rotateX(Math.toRadians(player.getRot().getX()), target.velocity, target.velocity);
+            Vector.rotateY(Math.toRadians(player.getRot().getY()), target.velocity, target.velocity);
+            target.velocity.scalarMult(25f);
+        }
     }
 }

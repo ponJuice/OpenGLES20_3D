@@ -47,18 +47,19 @@ public class Touch{
 		deltaY = this.y - getOrientPosition(x,y,Pos_Flag.Y);
 		this.x = getOrientPosition(x,y,Pos_Flag.X);
 		this.y = getOrientPosition(x,y,Pos_Flag.Y);
-		tl.execute(this);
+		if(tl != null)
+			tl.execute(this);
 	}
 	private float getOrientPosition(float x,float y,Pos_Flag flag){
 		if(flag == Pos_Flag.X){
 			if(Input.getOrientation() == 2){
-				return GLES20Util.getHight()-y;
+				return x;
 			}else {
 				return x;
 			}
 		}else{
 			if(Input.getOrientation() == 2){
-				return x;
+				return GLES20Util.getHight() - y;
 			}else {
 				return y;
 			}

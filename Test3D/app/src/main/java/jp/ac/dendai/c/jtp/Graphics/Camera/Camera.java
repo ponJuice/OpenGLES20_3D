@@ -30,7 +30,7 @@ public class Camera {
     private boolean posUpdate = false;
     private boolean persUpdate = false;
     private float mNear=1f,mFar=100f;
-    public Camera(CAMERA_MODE mode,float x,float y,float z){
+    public Camera(CAMERA_MODE mode,float x,float y,float z,float lx,float ly,float lz){
         update = true;
         posUpdate = true;
         persUpdate = true;
@@ -38,6 +38,9 @@ public class Camera {
         this.x = x;
         this.y = y;
         this.z = z;
+        this.lx = lx;
+        this.ly = ly;
+        this.lz = lz;
     }
     public float[] getCameraMatrix(){
         return cameraMatrix;
@@ -130,10 +133,10 @@ public class Camera {
     }
 
     public float convertTouchPosToGLPosX(float dispPosX){
-        return dispPosX / GLES20Util.getWidth() + (x - GLES20Util.getAspect()/2f);
+        return dispPosX / GLES20Util.getHight();
     }
     public float convertTouchPosToGLPosY(float dispPosY){
-        return dispPosY / GLES20Util.getHight() + (y - 0.5f);
+        return dispPosY / GLES20Util.getHight();
     }
 
     private static void setPerspectiveM(float[] m, int offset, double fovy, double aspect, double zNear, double zFar) {

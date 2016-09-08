@@ -24,12 +24,16 @@ public class Button implements UI {
     protected Camera camera;
     protected BUTTON_STATE state = BUTTON_STATE.NON;
     protected ButtonListener listener;
+    protected Touch touch;
     protected float hover_alpha = 0.5f;
     protected float non_hover_alpha = 1f;
     protected Rect rect;
     protected Texture tex;
     public Button(float left,float top,float right,float bottom){
         rect = new Rect(left,top,right,bottom);
+    }
+    public void setButtonListener(ButtonListener listener){
+        this.listener = listener;
     }
     public void setTop(float value){
         rect.setTop(value);
@@ -55,34 +59,49 @@ public class Button implements UI {
 
     @Override
     public void touch(Touch touch) {
+        if(this.touch != null && this.touch != touch)
+            return;
         float x = camera.convertTouchPosToGLPosX(touch.getPosition(Touch.Pos_Flag.X));
         float y = camera.convertTouchPosToGLPosY(touch.getPosition(Touch.Pos_Flag.Y));
         if(touch.getTouchID() == -1){
             //指が離された
             if(state != BUTTON_STATE.NON && rect.contains(x,y)){
                 state = BUTTON_STATE.UP;
+            }else{
+                this.touch = null;
             }
             return;
         }
         Log.d("button touch pos","device pos:"+"("+touch.getPosition(Touch.Pos_Flag.X)+","+ touch.getPosition(Touch.Pos_Flag.Y)+")"+"camera pos:("+x+","+y+")");
-        if(rect.contains(x,y)){
-            if(state == BUTTON_STATE.NON)
+        if(touch.getTouchID() != -1 && rect.contains(x,y)){
+            if(state == BUTTON_STATE.NON) {
                 state = BUTTON_STATE.DOWN;
+                this.touch = touch;
+            }
             else if(state == BUTTON_STATE.DOWN)
                 state = BUTTON_STATE.HOVER;
         }else{
-            if(state == BUTTON_STATE.DOWN || state == BUTTON_STATE.HOVER)
+            if(state == BUTTON_STATE.DOWN || state == BUTTON_STATE.HOVER) {
                 state = BUTTON_STATE.NON;
-            else if(state == BUTTON_STATE.UP)
+                this.touch = null;
+            }
+            else if(state == BUTTON_STATE.UP) {
                 state = BUTTON_STATE.NON;
+                this.touch = touch;
+            }
         }
     }
 
     @Override
     public void proc() {
         if(state == BUTTON_STATE.UP){
-            //listener.proc(this);
+            listener.touchUp(this);
             state = BUTTON_STATE.NON;
+        }else if(state == BUTTON_STATE.DOWN){
+            listener.touchDown(this);
+            state = BUTTON_STATE.HOVER;
+        }else if(state == BUTTON_STATE.HOVER){
+            listener.touchHover(this);
         }
     }
 

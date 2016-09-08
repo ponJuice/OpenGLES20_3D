@@ -11,7 +11,7 @@ import jp.ac.dendai.c.jtp.Math.Vector3;
  */
 public class Player extends GameObject{
     protected Vector3 direct;
-    protected float radius = 10f;
+    protected float radius = 1f;
     protected float[] p = {0,0,0,1f};
     protected float[] l = {0,0,0,1f};
     protected float[] t = new float[16];
